@@ -1,0 +1,31 @@
+AllCops:
+  TargetRubyVersion: 3.1
+
+require:
+  - rubocop-performance
+  - rubocop-sorbet
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Layout/LineLength:
+  Max: 150
+
+Metrics/MethodLength:
+  Max: 30
+  Exclude:
+    - spec/**/*
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+    - query_packwerk.gemspec
+
+Metrics/ModuleLength:
+  Max: 200
+
+Metrics/ClassLength:
+  Max: 200
