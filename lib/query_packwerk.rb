@@ -24,45 +24,52 @@ module QueryPackwerk
 
   # All violations for a pack
   sig { params(pack_name: String).returns(QueryPackwerk::Violations) }
-  def self.violations_for(pack_name)
+  def violations_for(pack_name)
     QueryPackwerk::Violations.where(producing_pack: full_name(pack_name))
   end
+  module_function :violations_for
 
   # Where the violations occurred
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
-  def self.violation_sources_for(pack_name)
+  def violation_sources_for(pack_name)
     violations_for(pack_name).sources_with_locations
   end
+  module_function :violation_sources_for
 
   # How often the violations occurred
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
-  def self.violation_counts_for(pack_name, threshold: 0)
+  def violation_counts_for(pack_name, threshold: 0)
     violations_for(pack_name).source_counts(threshold: threshold)
   end
+  module_function :violation_counts_for
 
   # The "shape" of all of the occurring violations
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
-  def self.anonymous_violation_sources_for(pack_name)
+  def anonymous_violation_sources_for(pack_name)
     violations_for(pack_name).anonymous_sources
   end
+  module_function :anonymous_violation_sources_for
 
   # How often each of those shapes occurs
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
-  def self.anonymous_violation_counts_for(pack_name, threshold: 0)
+  def anonymous_violation_counts_for(pack_name, threshold: 0)
     violations_for(pack_name).anonymous_source_counts(threshold: threshold)
   end
+  module_function :anonymous_violation_counts_for
 
   # Who consumes this pack?
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, Integer]) }
-  def self.consumers(pack_name, threshold: 0)
+  def consumers(pack_name, threshold: 0)
     violations_for(pack_name).consumers(threshold: threshold)
   end
+  module_function :consumers
 
   # In case anyone is still using shorthand for pack names
   sig { params(pack_name: String).returns(String) }
-  def self.full_name(pack_name)
+  def full_name(pack_name)
     return pack_name if pack_name.match?(%r{\A(packs|components)/})
 
     "packs/#{pack_name}"
   end
+  module_function :full_name
 end
