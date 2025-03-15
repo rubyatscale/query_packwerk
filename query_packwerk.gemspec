@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "parse_packwerk"
   spec.add_dependency "rubocop"
   spec.add_dependency "sorbet-runtime"
+  spec.add_dependency "thor"
 
   spec.add_development_dependency "sorbet"
   spec.add_development_dependency "tapioca"
