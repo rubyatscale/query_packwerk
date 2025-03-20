@@ -114,12 +114,12 @@ module QueryPackwerk
           query_params.all? do |param, query_matcher|
             object_value = object_params[param]
 
-            # TODO: Use pattern matching for this in 3.x+, 2.7.x raises deprecation warnings.
-            if query_matcher.is_a?(Array) && object_value.is_a?(Array)
+            case [query_matcher, object_value]
+            in [Array, Array]
               intersects?(query_matcher, object_value)
-            elsif query_matcher.is_a?(Array)
+            in [Array, _]
               any_compare?(query_matcher, object_value)
-            elsif object_value.is_a?(Array)
+            in [_, Array]
               includes?(query_matcher, object_value)
             else
               case_equal?(query_matcher, object_value)
