@@ -13,7 +13,6 @@ module QueryPackwerk
          "Query packwerk in the current directory via console"
     sig { params(directory: String).void }
     def console(directory = Dir.pwd)
-      require "query_packwerk/console"
       QueryPackwerk::Console.start(directory)
     end
   end
