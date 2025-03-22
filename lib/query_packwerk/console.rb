@@ -7,7 +7,7 @@ module QueryPackwerk
     extend T::Sig
 
     sig { params(directory: String).void }
-    def self.start(directory)
+    def self.start(directory = Dir.pwd)
       puts "Loading packwerk context in #{directory}..."
 
       Dir.chdir(directory) do
