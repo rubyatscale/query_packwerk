@@ -3,11 +3,7 @@
 
 require 'sorbet-runtime'
 require 'parse_packwerk'
-
-require_relative 'query_packwerk/query_interface'
-require_relative 'query_packwerk/rule_rewriter'
-require_relative 'query_packwerk/file_cache'
-require_relative 'query_packwerk/version'
+require 'rubocop'
 
 #
 # QueryPackwerk is a tool for querying Packwerk violations.

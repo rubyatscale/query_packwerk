@@ -1,8 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'rubocop'
-
 module QueryPackwerk
   class RuleRewriter
     # Abstract base class for source code transformation rules.
