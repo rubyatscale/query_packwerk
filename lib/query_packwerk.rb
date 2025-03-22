@@ -1,13 +1,13 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "sorbet-runtime"
-require "parse_packwerk"
+require 'sorbet-runtime'
+require 'parse_packwerk'
 
-require_relative "query_packwerk/query_interface"
-require_relative "query_packwerk/rule_rewriter"
-require_relative "query_packwerk/file_cache"
-require_relative "query_packwerk/version"
+require_relative 'query_packwerk/query_interface'
+require_relative 'query_packwerk/rule_rewriter'
+require_relative 'query_packwerk/file_cache'
+require_relative 'query_packwerk/version'
 
 #
 # QueryPackwerk is a tool for querying Packwerk violations.
@@ -16,15 +16,15 @@ require_relative "query_packwerk/version"
 # for querying package.yml and package_todo.yml files.
 #
 module QueryPackwerk
-  autoload :Console, "query_packwerk/console"
-  autoload :QueryInterface, "query_packwerk/query_interface"
-  autoload :Violations, "query_packwerk/violations"
-  autoload :Violation, "query_packwerk/violation"
-  autoload :Packages, "query_packwerk/packages"
-  autoload :Package, "query_packwerk/package"
-  autoload :RuleRewriter, "query_packwerk/rule_rewriter"
-  autoload :FileCache, "query_packwerk/file_cache"
-  autoload :Version, "query_packwerk/version"
+  autoload :Console, 'query_packwerk/console'
+  autoload :QueryInterface, 'query_packwerk/query_interface'
+  autoload :Violations, 'query_packwerk/violations'
+  autoload :Violation, 'query_packwerk/violation'
+  autoload :Packages, 'query_packwerk/packages'
+  autoload :Package, 'query_packwerk/package'
+  autoload :RuleRewriter, 'query_packwerk/rule_rewriter'
+  autoload :FileCache, 'query_packwerk/file_cache'
+  autoload :Version, 'query_packwerk/version'
 
   extend T::Sig
 

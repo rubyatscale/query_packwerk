@@ -1,9 +1,9 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "rubocop"
-require_relative "anonymize_arguments_rule"
-require_relative "anonymize_keyword_arguments_rule"
+require 'rubocop'
+require_relative 'anonymize_arguments_rule'
+require_relative 'anonymize_keyword_arguments_rule'
 
 module QueryPackwerk
   class RuleRewriter
@@ -35,11 +35,10 @@ module QueryPackwerk
 
         @rewriter
           .process
-          .delete("\n")    # Remove multi-line args
-          .gsub(/ +/, " ") # ...and multiple spaces, probably indents from above
-          .gsub("( ", "(") # Remove paren spacing after previous
-          .gsub(" )", ")") # Remove paren spacing after previous
-          .gsub(". ", ".") # Remove suffix-dot spacing
+          .delete("\n").squeeze(' ') # ...and multiple spaces, probably indents from above
+          .gsub('( ', '(') # Remove paren spacing after previous
+          .gsub(' )', ')') # Remove paren spacing after previous
+          .gsub('. ', '.') # Remove suffix-dot spacing
       end
 
       private

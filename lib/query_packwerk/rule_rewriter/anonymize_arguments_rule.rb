@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require_relative "base_rule"
+require_relative 'base_rule'
 
 module QueryPackwerk
   class RuleRewriter

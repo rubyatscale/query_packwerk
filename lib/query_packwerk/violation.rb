@@ -175,7 +175,7 @@ module QueryPackwerk
 
           location = "#{file_name}:#{s.loc.line} (L#{start_pos}..#{end_pos})"
           context = @file_cache.get_file(file_name).lines.slice(start_pos..end_pos)
-          full_context = unindent((context || [""]).join)
+          full_context = unindent((context || ['']).join)
 
           [@file_cache.anonymize_arguments(s.source), "> #{location}\n\n#{full_context}"]
         end
@@ -233,7 +233,7 @@ module QueryPackwerk
         value = @file_cache.set(
           :is_constant,
           key: class_name,
-          value: class_name.split("::").last&.match?(ALL_CAPS)
+          value: class_name.split('::').last&.match?(ALL_CAPS)
         )
 
         runtime_values[:is_constant] = value
@@ -252,8 +252,8 @@ module QueryPackwerk
 
         # Type related properties, including convenience boolean handlers
         type: type,
-        privacy: type == "privacy",
-        dependency: type == "dependency",
+        privacy: type == 'privacy',
+        dependency: type == 'dependency',
 
         # Reaching into which pack produced the violated constant, and
         # which consumes the violated constant.
@@ -284,7 +284,7 @@ module QueryPackwerk
     def unindent(string)
       # Multi-line match, this is intentional
       min_space = string.scan(/^\s*/).min_by(&:length)
-      string.gsub(/^#{min_space}/, "")
+      string.gsub(/^#{min_space}/, '')
     end
   end
 end

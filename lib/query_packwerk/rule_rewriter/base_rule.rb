@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "rubocop"
+require 'rubocop'
 
 module QueryPackwerk
   class RuleRewriter
@@ -12,7 +12,7 @@ module QueryPackwerk
     class BaseRule < Parser::AST::Processor
       include RuboCop::AST::Traversal
 
-      ANONYMIZED = "_"
+      ANONYMIZED = '_'
 
       def initialize(rewriter)
         @rewriter = rewriter

@@ -40,7 +40,7 @@ module QueryPackwerk
 
     sig { returns(String) }
     def owner
-      metadata["owner"] || Packages::UNOWNED
+      metadata['owner'] || Packages::UNOWNED
     end
 
     sig { returns(Pathname) }
@@ -76,8 +76,8 @@ module QueryPackwerk
     def deconstruct_keys(keys)
       all_values = {
         name: name,
-        owner: metadata.fetch("owner", Packages::UNOWNED),
-        owned: metadata["owner"].nil?,
+        owner: metadata.fetch('owner', Packages::UNOWNED),
+        owned: metadata['owner'].nil?,
         dependencies: dependencies,
 
         # Used for future implementations of NestedPacks
