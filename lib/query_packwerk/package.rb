@@ -86,5 +86,10 @@ module QueryPackwerk
 
       keys.nil? ? all_values : all_values.slice(*T.unsafe(keys))
     end
+
+    sig { returns(String) }
+    def inspect
+      "#<#{self.class.name} name=#{name} owner=#{owner} dependencies=#{dependencies}>"
+    end
   end
 end

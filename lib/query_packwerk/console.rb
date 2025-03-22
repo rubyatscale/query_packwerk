@@ -60,6 +60,7 @@ module QueryPackwerk
         puts "  anonymous_violation_sources_for(pack_name) - Get the 'shape' of violations"
         puts '  anonymous_violation_counts_for(pack_name)  - Get how often each shape occurs'
         puts '  consumers(pack_name)                       - Get who consumes this pack'
+        puts '  package(pack_name)                         - Get a package by name'
         puts '  Packages.all                               - Get all packages'
         puts '  Violations.all                             - Get all violations'
         puts ''
