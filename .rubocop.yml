@@ -1,31 +1,80 @@
-AllCops:
-  TargetRubyVersion: 3.1
-
-require:
-  - rubocop-performance
+plugins:
   - rubocop-sorbet
+  - rubocop-performance
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  Exclude:
+    - bin/**/*
+    - vendor/**/*
 
-Style/StringLiteralsInInterpolation:
-  EnforcedStyle: double_quotes
+Sorbet/StrictSigil:
+  Enabled: true
+  Exclude:
+    - spec/**/*
+    - sorbet/**/*
+
+Layout/ExtraSpacing:
+  Enabled: true
+  Exclude:
+    - danger-packwerk.gemspec
+
+Layout/SpaceAroundOperators:
+  Enabled: true
+  Exclude:
+    - danger-packwerk.gemspec
+
+Sorbet/ValidSigil:
+  Enabled: true
+
+Gemspec/RequireMFA:
+  Enabled: false
 
 Layout/LineLength:
-  Max: 150
-
-Metrics/MethodLength:
-  Max: 30
-  Exclude:
-    - spec/**/*
+  Enabled: false
 
 Metrics/BlockLength:
-  Exclude:
-    - spec/**/*
-    - query_packwerk.gemspec
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/SignalException:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
 
 Metrics/ModuleLength:
-  Max: 200
+  Enabled: false
 
-Metrics/ClassLength:
-  Max: 200
+Sorbet/FalseSigil:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false

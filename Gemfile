@@ -1,22 +1,21 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 # Specify your gem's dependencies in query_packwerk.gemspec
 gemspec
 
-gem "irb"
-gem "pry"
+gem 'irb'
+gem 'pry'
 
-gem "rake", "~> 13.0"
+gem 'packs-specification'
 
-gem "rspec", "~> 3.0"
+gem 'rake', '~> 13.0'
+gem 'rspec', '~> 3.0'
 
-gem "packs-specification"
+gem 'rubocop', '~> 1.74'
+gem 'rubocop-performance', '~> 1.24'
+gem 'rubocop-sorbet', '~> 0.9'
 
-gem "rubocop", "~> 1.21"
-gem "rubocop-performance", "~> 1.16"
-gem "rubocop-sorbet", "~> 0.7.0"
-
-gem "sorbet"
-gem "tapioca"
+gem 'sorbet'
+gem 'tapioca'
