@@ -146,7 +146,7 @@ module QueryPackwerk
       # the code much more complicated.
       sig { params(query_matcher: T::Array[T.untyped], object_value: T::Array[T.untyped]).returns(T::Boolean) }
       def intersects?(query_matcher, object_value)
-        (query_matcher & object_value).any?
+        query_matcher.intersect?(object_value)
       end
 
       # Query Array to Any object value checks if any of the query matchers match that value
@@ -158,7 +158,7 @@ module QueryPackwerk
       # Any other type of Query to Array is find if any value matches the condition
       sig { params(query_matcher: T.untyped, object_value: T::Array[T.untyped]).returns(T::Boolean) }
       def includes?(query_matcher, object_value)
-        object_value.any? { |v| query_matcher === v } # rubocop:disable Style/CaseEquality
+        object_value.any? { |v| query_matcher === v } # rubocop:disable Style/CaseEquality, Performance/RedundantEqualityComparisonBlock
       end
 
       # Otherwise we use `===` to decide if it's a match, and we use it explicitly as
