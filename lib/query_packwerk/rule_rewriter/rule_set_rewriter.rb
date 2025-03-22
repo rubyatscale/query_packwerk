@@ -1,10 +1,6 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'rubocop'
-require_relative 'anonymize_arguments_rule'
-require_relative 'anonymize_keyword_arguments_rule'
-
 module QueryPackwerk
   class RuleRewriter
     # Coordinates the application of multiple rewriting rules to source code.
