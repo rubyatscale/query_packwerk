@@ -23,7 +23,8 @@ module QueryPackwerk
   autoload :Version, 'query_packwerk/version'
 
   extend T::Sig
-  extend self # TODO: module_function isn't playing nicely with Sorbet
+  # TODO: module_function isn't playing nicely with Sorbet
+  extend self # rubocop:todo Style/ModuleFunction
 
   # All violations for a pack
   sig { params(pack_name: String).returns(QueryPackwerk::Violations) }
