@@ -26,6 +26,11 @@ module QueryPackwerk
   # TODO: module_function isn't playing nicely with Sorbet
   extend self # rubocop:todo Style/ModuleFunction
 
+  sig { params(name: String).returns(T.nilable(QueryPackwerk::Package)) }
+  def package(name)
+    Packages.where(name: name).first
+  end
+
   # All violations for a pack
   sig { params(pack_name: String).returns(QueryPackwerk::Violations) }
   def violations_for(pack_name)

@@ -4,6 +4,16 @@
 RSpec.describe QueryPackwerk do
   include_context 'pseudo packs'
 
+  describe '#package' do
+    it 'gets a package by name' do
+      expect(described_class.package(package_name)).to be_a(QueryPackwerk::Package)
+    end
+
+    it 'returns nil if the package does not exist' do
+      expect(described_class.package('not_here')).to be_nil
+    end
+  end
+
   describe '#violations_for' do
     it 'gets all violations for a pack' do
       violations = described_class.violations_for(package_name)
