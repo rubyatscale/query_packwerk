@@ -8,6 +8,9 @@ module QueryPackwerk
   class Package
     extend T::Sig
 
+    sig { returns(ParsePackwerk::Package) }
+    attr_reader :original_package
+
     sig { params(original_package: ParsePackwerk::Package).void }
     def initialize(original_package:)
       @original_package = original_package
