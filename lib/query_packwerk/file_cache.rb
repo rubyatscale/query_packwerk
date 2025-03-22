@@ -40,10 +40,10 @@ module QueryPackwerk
 
       file_names.each do |f|
         get_file_ast(f)
-        print "."
+        print '.'
       end
 
-      puts "", "AST cache loaded" if headers
+      puts '', 'AST cache loaded' if headers
     end
 
     sig { params(cache_name: Symbol, key: T.untyped, value: T.untyped).returns(T.untyped) }
@@ -70,7 +70,7 @@ module QueryPackwerk
       @file_cache[file_name] ||= if RUBY_FILE.match?(file_name) && File.exist?(file_name)
                                    File.read(file_name)
                                  else
-                                   "x"
+                                   'x'
                                  end
     end
 
@@ -82,7 +82,7 @@ module QueryPackwerk
       return T.must(@file_const_cache[const_key]) if @file_const_cache.key?(const_key)
 
       absolute_const_node = ast_from(class_name)
-      relative_const_node = ast_from(class_name.delete_prefix("::"))
+      relative_const_node = ast_from(class_name.delete_prefix('::'))
 
       @file_const_cache[const_key] = get_file_ast(file_name).each_descendant.select do |node|
         next false unless node.const_type?
@@ -111,8 +111,7 @@ module QueryPackwerk
     def anonymize_arguments(source)
       @anonymized_args_cache[source] ||= RuleRewriter
                                          .rewrite(source)
-                                         .delete("\n")
-                                         .gsub(/ +/, " ").delete_prefix("::")
+                                         .delete("\n").squeeze(' ').delete_prefix('::')
     end
 
     # Get the full receiver chains on a constant, and anonymize their arguments

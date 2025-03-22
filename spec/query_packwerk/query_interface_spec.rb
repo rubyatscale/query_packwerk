@@ -11,9 +11,9 @@ RSpec.describe QueryPackwerk::QueryInterface do
           adult: age >= 18,
           sex: sex,
           hobbies: hobbies,
-          male: sex == "male",
-          female: sex == "female",
-          nonbinary: sex != "female" && sex != "male"
+          male: sex == 'male',
+          female: sex == 'female',
+          nonbinary: sex != 'female' && sex != 'male'
         }
 
         keys.nil? ? all_values : all_values.slice(*keys)
@@ -23,10 +23,10 @@ RSpec.describe QueryPackwerk::QueryInterface do
 
   let(:all_people) do
     [
-      person.new(name: "Bob", age: 42, sex: "male", hobbies: %w[trains planes]),
-      person.new(name: "Sue", age: 24, sex: "female", hobbies: %w[painting singing]),
-      person.new(name: "Ryan", age: 30, sex: "unspecified", hobbies: %w[fencing gardening]),
-      person.new(name: "Kai", age: 17, sex: "male", hobbies: %w[piano climbing])
+      person.new(name: 'Bob', age: 42, sex: 'male', hobbies: %w[trains planes]),
+      person.new(name: 'Sue', age: 24, sex: 'female', hobbies: %w[painting singing]),
+      person.new(name: 'Ryan', age: 30, sex: 'unspecified', hobbies: %w[fencing gardening]),
+      person.new(name: 'Kai', age: 17, sex: 'male', hobbies: %w[piano climbing])
     ]
   end
 
@@ -66,55 +66,55 @@ RSpec.describe QueryPackwerk::QueryInterface do
             adult: ->(v) { v.age >= 18 },
             sex: lambda(&:sex),
             hobbies: lambda(&:hobbies),
-            male: ->(v) { v.sex == "male" },
-            female: ->(v) { v.sex == "female" },
-            nonbinary: ->(v) { v.sex != "female" && v.sex != "male" }
+            male: ->(v) { v.sex == 'male' },
+            female: ->(v) { v.sex == 'female' },
+            nonbinary: ->(v) { v.sex != 'female' && v.sex != 'male' }
           }
         end
       end
     end
   end
 
-  describe ".all" do
-    it "returns all people" do
+  describe '.all' do
+    it 'returns all people' do
       expect(people.all).to be_a(people)
     end
   end
 
-  describe ".where" do
-    it "can get people by conditions" do
+  describe '.where' do
+    it 'can get people by conditions' do
       expect(people.where(adult: true).count).to eq(3)
     end
 
-    it "can work with === interfaces" do
+    it 'can work with === interfaces' do
       expect(people.where(age: 20..30).count).to eq(2)
     end
 
-    it "can work with array inclusion" do
+    it 'can work with array inclusion' do
       expect(people.where(name: %w[Sue Bob]).count).to eq(2)
     end
 
-    it "can work with multiple conditions" do
+    it 'can work with multiple conditions' do
       expect(people.where(adult: true, nonbinary: true).count).to eq(1)
     end
 
-    it "can search into nested Arrays" do
-      expect(people.where(hobbies: "piano").count).to eq(1)
+    it 'can search into nested Arrays' do
+      expect(people.where(hobbies: 'piano').count).to eq(1)
     end
 
-    it "can check for multiple potential Array matches" do
+    it 'can check for multiple potential Array matches' do
       expect(people.where(hobbies: %w[piano fencing]).count).to eq(2)
     end
   end
 
-  describe "#count" do
-    it "can get the count/size/length of a query" do
+  describe '#count' do
+    it 'can get the count/size/length of a query' do
       expect(people.all.count).to eq(4)
     end
   end
 
-  describe "#each" do
-    it "includes an Enumerable interface" do
+  describe '#each' do
+    it 'includes an Enumerable interface' do
       # It's making assumptions about `all` in the context of RSpec which don't make sense.
       people.all.each do |a_person|
         expect(a_person).to be_a(person)

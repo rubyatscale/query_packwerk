@@ -1,6 +1,6 @@
 # typed: strict
 
-require "thor"
+require 'thor'
 
 module QueryPackwerk
   # CLI for loading the QueryPackwerk console
@@ -9,8 +9,8 @@ module QueryPackwerk
 
     default_command :console
 
-    desc "console",
-         "Query packwerk in the current directory via console"
+    desc 'console',
+         'Query packwerk in the current directory via console'
     sig { params(directory: String).void }
     def console(directory = Dir.pwd)
       QueryPackwerk::Console.start(directory)

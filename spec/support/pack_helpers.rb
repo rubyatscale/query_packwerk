@@ -5,14 +5,14 @@ module PackHelpers
   def write_package_yml(name, enforce_privacy: true, enforce_dependencies: true, dependencies: [], owner: nil,
                         config: {})
     package_config = {
-      "dependencies" => dependencies,
-      "enforce_privacy" => enforce_privacy,
-      "enforce_dependencies" => enforce_dependencies,
-      "metadata" => { "owner" => owner }
+      'dependencies' => dependencies,
+      'enforce_privacy' => enforce_privacy,
+      'enforce_dependencies' => enforce_dependencies,
+      'metadata' => { 'owner' => owner }
     }
 
     package_config = package_config.merge(config)
-    package_config.delete("enforce_privacy") if enforce_privacy.nil?
+    package_config.delete('enforce_privacy') if enforce_privacy.nil?
 
     write_pack(name, package_config)
   end
@@ -40,8 +40,8 @@ module PackHelpers
       constant_name, files, pack_name, type = violation.slice(:class_name, :files, :to_package_name, :type).values
 
       package_todo[pack_name][constant_name].merge!(
-        "files" => files,
-        "violations" => [type]
+        'files' => files,
+        'violations' => [type]
       ) { |_k, old, current| (old + current).uniq }
     end
 
@@ -59,9 +59,7 @@ module PackHelpers
       constants_violated.each do |constant_name, violation_info|
         relevant_keys = violation_info.transform_keys(&:to_sym).slice(:violations, :files)
 
-        unless relevant_keys.key?(:violations) && relevant_keys.key?(:files)
-          raise ArgumentError, "Must provide violations and files for each constant: #{constant_name}"
-        end
+        raise ArgumentError, "Must provide violations and files for each constant: #{constant_name}" unless relevant_keys.key?(:violations) && relevant_keys.key?(:files)
       end
     end
 
