@@ -278,6 +278,11 @@ module QueryPackwerk
       keys.nil? ? all_values : all_values.slice(*T.unsafe(keys))
     end
 
+    sig { returns(String) }
+    def inspect
+      "#<#{self.class.name} #{consuming_pack.name} -> #{class_name} (#{type})>"
+    end
+
     private
 
     sig { params(string: String).returns(String) }

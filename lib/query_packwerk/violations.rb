@@ -239,6 +239,15 @@ module QueryPackwerk
       QueryPackwerk::Violations.new(filtered_violations)
     end
 
+    sig { returns(String) }
+    def inspect
+      [
+        "#<#{self.class.name} [",
+        to_a.map(&:inspect).join("\n"),
+        ']>'
+      ].join("\n")
+    end
+
     private
 
     sig { params(string: String).returns(String) }
