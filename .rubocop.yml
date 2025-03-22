@@ -10,10 +10,7 @@ AllCops:
     - vendor/**/*
 
 Sorbet/StrictSigil:
-  Enabled: true
-  Exclude:
-    - spec/**/*
-    - sorbet/**/*
+  Enabled: false
 
 Layout/ExtraSpacing:
   Enabled: true
@@ -58,6 +55,9 @@ Metrics/CyclomaticComplexity:
 Metrics/ModuleLength:
   Enabled: false
 
+Metrics/ClassLength:
+  Enabled: false
+
 Sorbet/FalseSigil:
   Enabled: false
 
@@ -77,4 +77,13 @@ Metrics/PerceivedComplexity:
   Enabled: false
 
 Metrics/ParameterLists:
+  Enabled: false
+
+Style/SuperArguments:
+  Enabled: false
+
+Style/ArgumentsForwarding:
+  Enabled: false
+
+Style/BlockForwarding:
   Enabled: false

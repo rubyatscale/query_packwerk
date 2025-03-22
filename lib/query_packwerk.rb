@@ -27,48 +27,43 @@ module QueryPackwerk
   autoload :Version, 'query_packwerk/version'
 
   extend T::Sig
+  extend self # TODO: module_function isn't playing nicely with Sorbet
 
   # All violations for a pack
   sig { params(pack_name: String).returns(QueryPackwerk::Violations) }
   def violations_for(pack_name)
     QueryPackwerk::Violations.where(producing_pack: full_name(pack_name))
   end
-  module_function :violations_for
 
   # Where the violations occurred
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
   def violation_sources_for(pack_name)
     violations_for(pack_name).sources_with_locations
   end
-  module_function :violation_sources_for
 
   # How often the violations occurred
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
   def violation_counts_for(pack_name, threshold: 0)
     violations_for(pack_name).source_counts(threshold: threshold)
   end
-  module_function :violation_counts_for
 
   # The "shape" of all of the occurring violations
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
   def anonymous_violation_sources_for(pack_name)
     violations_for(pack_name).anonymous_sources
   end
-  module_function :anonymous_violation_sources_for
 
   # How often each of those shapes occurs
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
   def anonymous_violation_counts_for(pack_name, threshold: 0)
     violations_for(pack_name).anonymous_source_counts(threshold: threshold)
   end
-  module_function :anonymous_violation_counts_for
 
   # Who consumes this pack?
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, Integer]) }
   def consumers(pack_name, threshold: 0)
     violations_for(pack_name).consumers(threshold: threshold)
   end
-  module_function :consumers
 
   # In case anyone is still using shorthand for pack names
   sig { params(pack_name: String).returns(String) }
@@ -77,5 +72,4 @@ module QueryPackwerk
 
     "packs/#{pack_name}"
   end
-  module_function :full_name
 end

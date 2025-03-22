@@ -4,6 +4,9 @@
 module QueryPackwerk
   class RuleRewriter
     class AnonymizeKeywordArgumentsRule < BaseRule
+      extend T::Sig
+
+      sig { override.params(node: RuboCop::AST::Node).void }
       def on_send(node)
         return unless node.arguments?
 

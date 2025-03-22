@@ -6,9 +6,12 @@ require_relative 'base_rule'
 module QueryPackwerk
   class RuleRewriter
     class AnonymizeArgumentsRule < BaseRule
-      # Arguments prefixed with a sigil like `*arg` and `&fn`
-      SIGIL_ARGS = %i[splat block_pass].freeze
+      extend T::Sig
 
+      # Arguments prefixed with a sigil like `*arg` and `&fn`
+      SIGIL_ARGS = T.let(%i[splat block_pass].freeze, T::Array[Symbol])
+
+      sig { override.params(node: RuboCop::AST::Node).void }
       def on_send(node)
         return unless node.arguments?
 
