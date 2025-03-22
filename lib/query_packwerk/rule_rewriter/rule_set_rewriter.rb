@@ -12,7 +12,16 @@ module QueryPackwerk
     # applies each configured rule in sequence to transform source code for
     # analysis purposes.
     class RuleSetRewriter
-      attr_reader :source, :source_buffer, :ast
+      extend T::Sig
+
+      sig { returns(RuboCop::ProcessedSource) }
+      attr_reader :source
+
+      sig { returns(RuboCop::AST::Node) }
+      attr_reader :ast
+
+      sig { returns(Parser::Source::TreeRewriter) }
+      attr_reader :rewriter
 
       RULES = [
         RuleRewriter::AnonymizeKeywordArgumentsRule,

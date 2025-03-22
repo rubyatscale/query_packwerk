@@ -218,7 +218,7 @@ module QueryPackwerk
       return { is_active_record: false, is_constant: false } unless Kernel.const_defined?(class_name)
 
       if keys.nil? || keys.include?(:is_active_record)
-        constant = Kernel.const_get(class_name)
+        constant = Kernel.const_get(class_name) # rubocop:disable Sorbet/ConstantsFromStrings
 
         value = @file_cache.set(
           :is_active_record,

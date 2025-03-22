@@ -97,7 +97,7 @@ module QueryPackwerk
           _query_fn: T.nilable(T.proc.params(arg0: T.untyped).returns(T::Boolean))
         ).returns(T.untyped)
       end
-      def where(**query_params, &)
+      def where(**query_params, &_query_fn)
         query_keys = query_params.keys
         all_values = all
 

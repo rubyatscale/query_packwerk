@@ -12,6 +12,9 @@ module QueryPackwerk
   # particularly for anonymizing method arguments and source patterns
   # to facilitate pattern-based violation analysis.
   class RuleRewriter
+    extend T::Sig
+
+    sig { params(source_string: String).returns(String) }
     def self.rewrite(source_string)
       RuleSetRewriter.new(source_string).process
     end
