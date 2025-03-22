@@ -26,9 +26,13 @@ module QueryPackwerk
       # Get all packages wrapped in our interfaces
       sig { returns(QueryPackwerk::Packages) }
       def all
-        packages = ParsePackwerk.all.map { |p| QueryPackwerk::Package.new(original_package: p) }
-
-        QueryPackwerk::Packages.new(packages)
+        @all ||= T.let(
+          begin
+            packages = ParsePackwerk.all.map { |p| QueryPackwerk::Package.new(original_package: p) }
+            QueryPackwerk::Packages.new(packages)
+          end,
+          T.nilable(QueryPackwerk::Packages)
+        )
       end
 
       sig do
@@ -55,6 +59,15 @@ module QueryPackwerk
       QueryPackwerk::Violations.new(
         @original_collection.flat_map { |pack| pack.violations.original_collection }
       )
+    end
+
+    sig { returns(String) }
+    def inspect
+      [
+        "#<#{self.class.name} [",
+        to_a.map(&:inspect).join("\n"),
+        ']>'
+      ].join("\n")
     end
   end
 end
