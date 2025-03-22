@@ -1,7 +1,7 @@
 # typed: strict
 # frozen_string_literal: true
 
-require "coderay"
+require 'coderay'
 
 module QueryPackwerk
   # A collection class for managing and querying sets of Packwerk violations.
@@ -84,7 +84,7 @@ module QueryPackwerk
       @original_collection.each(&:load_cache!)
 
       finish_time = Time.now - start_time
-      puts "", "AST cache loaded in #{finish_time}"
+      puts '', "AST cache loaded in #{finish_time}"
       @cache_loaded = true
     end
 
@@ -101,7 +101,7 @@ module QueryPackwerk
       start_time = Time.now
 
       total_sources_loaded = @original_collection.sum do |violation|
-        print "."
+        print '.'
         violation.sources.size
       end
 
@@ -183,14 +183,14 @@ module QueryPackwerk
     sig { params(start_offset: Integer, end_offset: Integer).returns(String) }
     def sources_with_contexts_report(start_offset: 3, end_offset: 3)
       contexts = sources_with_contexts(start_offset:, end_offset:)
-      output = ""
+      output = ''
 
       contexts.each do |violated_constant, anonymized_sources|
-        heavy_underline = "=" * violated_constant.size
+        heavy_underline = '=' * violated_constant.size
         output << "#{violated_constant}\n#{heavy_underline}\n\n"
 
         anonymized_sources.each do |anonymized_source, full_contexts|
-          light_underline = "-" * anonymized_source.size
+          light_underline = '-' * anonymized_source.size
           output << "#{anonymized_source}\n#{light_underline}\n\n"
 
           full_contexts.each do |context|
