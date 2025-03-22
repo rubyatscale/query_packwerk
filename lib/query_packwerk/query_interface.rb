@@ -97,14 +97,14 @@ module QueryPackwerk
           _query_fn: T.nilable(T.proc.params(arg0: T.untyped).returns(T::Boolean))
         ).returns(T.untyped)
       end
-      def where(**query_params, &_query_fn)
+      def where(**query_params, &)
         query_keys = query_params.keys
         all_values = all
 
         accepted_keys = all_values.first.deconstruct_keys(nil).keys
         invalid_keys = query_keys - accepted_keys
 
-        raise ArgumentError, "The following keys are invalid for querying: #{invalid_keys.join(", ")}" if invalid_keys.any?
+        raise ArgumentError, "The following keys are invalid for querying: #{invalid_keys.join(', ')}" if invalid_keys.any?
 
         all_values.select do |value|
           next yield(value) if block_given?
