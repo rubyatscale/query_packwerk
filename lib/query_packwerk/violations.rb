@@ -183,7 +183,7 @@ module QueryPackwerk
     sig { params(start_offset: Integer, end_offset: Integer).returns(String) }
     def sources_with_contexts_report(start_offset: 3, end_offset: 3)
       contexts = sources_with_contexts(start_offset:, end_offset:)
-      output = ''
+      output = +''
 
       contexts.each do |violated_constant, anonymized_sources|
         heavy_underline = '=' * violated_constant.size
