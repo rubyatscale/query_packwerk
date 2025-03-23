@@ -36,6 +36,11 @@ module QueryPackwerk
       @original_package.metadata
     end
 
+    sig { returns(T::Hash[String, T.untyped]) }
+    def config
+      @original_package.config
+    end
+
     sig { returns(QueryPackwerk::Packages) }
     def dependencies
       Packages.where(name: @original_package.dependencies)
@@ -48,7 +53,7 @@ module QueryPackwerk
 
     sig { returns(String) }
     def owner
-      metadata['owner'] || Packages::UNOWNED
+      config['owner'] || Packages::UNOWNED
     end
 
     sig { returns(Pathname) }
@@ -96,8 +101,8 @@ module QueryPackwerk
     def deconstruct_keys(keys)
       all_values = {
         name: name,
-        owner: metadata.fetch('owner', Packages::UNOWNED),
-        owned: metadata['owner'].nil?,
+        owner: owner,
+        owned: owner != Packages::UNOWNED,
         dependencies: dependency_names,
 
         # Used for future implementations of NestedPacks
