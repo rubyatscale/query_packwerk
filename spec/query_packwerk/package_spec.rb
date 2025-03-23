@@ -55,32 +55,32 @@ RSpec.describe QueryPackwerk::Package do
     end
   end
 
-  describe '#violations' do
+  describe '#todos' do
     it 'returns violations for the package' do
-      violations = package.violations
-      expect(violations).to be_a(QueryPackwerk::Violations)
-      expect(violations.size).to eq(raw_violations.size)
+      todos = package.todos
+      expect(todos).to be_a(QueryPackwerk::Violations)
+      expect(todos.size).to eq(raw_violations.size)
     end
   end
 
-  describe '#todos' do
-    it 'is an alias for #violations' do
+  describe '#dependency_violations' do
+    it 'is an alias for #todos' do
       # Both methods should return equivalent objects but might not be equal with `==`
-      expect(package.todos.to_a).to match_array(package.violations.to_a)
+      expect(package.todos.to_a).to match_array(package.dependency_violations.to_a)
+    end
+  end
+
+  describe '#violations' do
+    it 'returns violations where this package is the producing pack' do
+      violations = package.violations
+      expect(violations).to be_a(QueryPackwerk::Violations)
     end
   end
 
   describe '#consumer_violations' do
-    it 'returns violations where this package is the producing pack' do
-      violations = package.consumer_violations
-      expect(violations).to be_a(QueryPackwerk::Violations)
-    end
-  end
-
-  describe '#incoming_violations' do
-    it 'is an alias for #consumer_violations' do
+    it 'is an alias for #violations' do
       # Both methods should return equivalent objects but might not be equal with `==`
-      expect(package.incoming_violations.to_a).to match_array(package.consumer_violations.to_a)
+      expect(package.consumer_violations.to_a).to match_array(package.violations.to_a)
     end
   end
 

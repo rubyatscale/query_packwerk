@@ -37,6 +37,10 @@ module QueryPackwerk
     QueryPackwerk::Violations.where(producing_pack: full_name(pack_name))
   end
 
+  def todos_for(pack_name)
+    package(pack_name).todos
+  end
+
   # Where the violations occurred
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
   def violation_sources_for(pack_name)

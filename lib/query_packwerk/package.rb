@@ -62,16 +62,16 @@ module QueryPackwerk
     end
 
     sig { returns(QueryPackwerk::Violations) }
-    def violations
+    def todos
       QueryPackwerk::Violations.where(consuming_pack: name)
     end
-    alias todos violations
+    alias dependency_violations todos
 
     sig { returns(QueryPackwerk::Violations) }
-    def consumer_violations
+    def violations
       QueryPackwerk::Violations.where(producing_pack: name)
     end
-    alias incoming_violations consumer_violations
+    alias consumer_violations violations
 
     sig { returns(QueryPackwerk::Packages) }
     def consumers
