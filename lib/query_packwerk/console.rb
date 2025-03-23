@@ -56,15 +56,21 @@ module QueryPackwerk
         puts 'QueryPackwerk Console'
         puts '====================='
         puts 'Available commands:'
-        puts '  violations_for(pack_name)                  - Get all violations for a pack'
-        puts '  violation_sources_for(pack_name)           - Get where violations occurred'
-        puts '  violation_counts_for(pack_name)            - Get how often violations occurred'
-        puts "  anonymous_violation_sources_for(pack_name) - Get the 'shape' of violations"
-        puts '  anonymous_violation_counts_for(pack_name)  - Get how often each shape occurs'
-        puts '  consumers(pack_name)                       - Get who consumes this pack'
         puts '  package(pack_name)                         - Get a package by name'
         puts '  Packages.all                               - Get all packages'
-        puts '  Violations.all                             - Get all violations'
+        puts ''
+        puts 'Package Consumption (how others use this package):'
+        puts '  violations_for(pack_name)                  - Get all violations where others access this package'
+        puts '  violation_sources_for(pack_name)           - Get where others access this package'
+        puts '  violation_counts_for(pack_name)            - Get how often others access this package'
+        puts "  anonymous_violation_sources_for(pack_name) - Get the 'shape' of how others access this package"
+        puts '  anonymous_violation_counts_for(pack_name)  - Get how often each access pattern occurs'
+        puts '  consumers(pack_name)                       - Get which packages consume this package'
+        puts ''
+        puts 'Package Dependencies (how this package uses others):'
+        puts '  todos_for(pack_name)                       - Get all todos where this package accesses others'
+        puts ''
+        puts 'Violations.all                               - Get all violations'
         puts ''
 
         catch(:IRB_EXIT) do

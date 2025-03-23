@@ -31,41 +31,45 @@ module QueryPackwerk
     Packages.where(name: name).first
   end
 
-  # All violations for a pack
+  # Get all violations where other packages access code from this package
+  # (i.e., this package is the producer, others are consumers)
   sig { params(pack_name: String).returns(QueryPackwerk::Violations) }
   def violations_for(pack_name)
     QueryPackwerk::Violations.where(producing_pack: full_name(pack_name))
   end
 
+  # Get all todos where this package accesses code from other packages
+  # (i.e., this package is the consumer, others are producers)
+  sig { params(pack_name: String).returns(QueryPackwerk::Violations) }
   def todos_for(pack_name)
-    package(pack_name).todos
+    QueryPackwerk::Violations.where(consuming_pack: full_name(pack_name))
   end
 
-  # Where the violations occurred
+  # Get where the violations occurred (where other packages access this package)
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
   def violation_sources_for(pack_name)
     violations_for(pack_name).sources_with_locations
   end
 
-  # How often the violations occurred
+  # Get how often the violations occurred
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
   def violation_counts_for(pack_name, threshold: 0)
     violations_for(pack_name).source_counts(threshold: threshold)
   end
 
-  # The "shape" of all of the occurring violations
+  # Get the 'shape' of all violations (how other packages access this package)
   sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
   def anonymous_violation_sources_for(pack_name)
     violations_for(pack_name).anonymous_sources
   end
 
-  # How often each of those shapes occurs
+  # Get how often each 'shape' of violation occurs (counts of how other packages access this package)
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
   def anonymous_violation_counts_for(pack_name, threshold: 0)
     violations_for(pack_name).anonymous_source_counts(threshold: threshold)
   end
 
-  # Who consumes this pack?
+  # Get which packages consume code from this package (who depends on this package)
   sig { params(pack_name: String, threshold: Integer).returns(T::Hash[String, Integer]) }
   def consumers(pack_name, threshold: 0)
     violations_for(pack_name).consumers(threshold: threshold)

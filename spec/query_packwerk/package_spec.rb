@@ -63,10 +63,10 @@ RSpec.describe QueryPackwerk::Package do
     end
   end
 
-  describe '#dependency_violations' do
+  describe '#outgoing_violations' do
     it 'is an alias for #todos' do
       # Both methods should return equivalent objects but might not be equal with `==`
-      expect(package.todos.to_a).to match_array(package.dependency_violations.to_a)
+      expect(package.todos.to_a).to match_array(package.outgoing_violations.to_a)
     end
   end
 
@@ -77,10 +77,10 @@ RSpec.describe QueryPackwerk::Package do
     end
   end
 
-  describe '#consumer_violations' do
+  describe '#incoming_violations' do
     it 'is an alias for #violations' do
       # Both methods should return equivalent objects but might not be equal with `==`
-      expect(package.consumer_violations.to_a).to match_array(package.violations.to_a)
+      expect(package.incoming_violations.to_a).to match_array(package.violations.to_a)
     end
   end
 

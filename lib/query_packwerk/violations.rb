@@ -219,6 +219,13 @@ module QueryPackwerk
       threshold_filter_sort(tallies, threshold:)
     end
 
+    # Find which packs produce these violations
+    sig { params(threshold: Integer).returns(T::Hash[String, Integer]) }
+    def producers(threshold: 0)
+      tallies = @original_collection.map { |v| v.producing_pack.name }.tally
+      threshold_filter_sort(tallies, threshold:)
+    end
+
     # Filter for violations which include one of the provided file globs
     sig { params(file_globs: T.any(String, Regexp)).returns(QueryPackwerk::Violations) }
     def including_files(*file_globs)

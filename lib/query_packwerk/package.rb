@@ -61,31 +61,40 @@ module QueryPackwerk
       Pathname.new(name).cleanpath
     end
 
+    # Returns violations where this package is the consumer (i.e., this package
+    # has dependencies on other packages). These are the "todos" in the package_todo.yml
+    # file for this package.
     sig { returns(QueryPackwerk::Violations) }
     def todos
       QueryPackwerk::Violations.where(consuming_pack: name)
     end
-    alias dependency_violations todos
+    alias outgoing_violations todos
 
+    # Returns violations where this package is the producer (i.e., other packages
+    # depend on this package). These are violations where other packages are
+    # accessing code from this package.
     sig { returns(QueryPackwerk::Violations) }
     def violations
       QueryPackwerk::Violations.where(producing_pack: name)
     end
-    alias consumer_violations violations
+    alias incoming_violations violations
 
+    # Returns all packages that consume (depend on) this package
     sig { returns(QueryPackwerk::Packages) }
     def consumers
       Packages.where(name: consumer_names)
     end
 
+    # Returns the names of all packages that consume (depend on) this package
     sig { returns(T::Array[String]) }
     def consumer_names
-      consumer_violations.consumers.keys
+      violations.consumers.keys
     end
 
+    # Returns a count of how often each consumer package accesses this package
     sig { returns(T::Hash[String, Integer]) }
     def consumer_counts
-      consumer_violations.consumers
+      violations.consumers
     end
 
     sig { returns(String) }
