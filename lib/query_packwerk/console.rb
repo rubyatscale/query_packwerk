@@ -38,7 +38,9 @@ module QueryPackwerk
 
         context = Class.new do
           include QueryPackwerk
+          extend T::Sig
 
+          sig { returns(String) }
           def inspect
             'query_packwerk console'
           end
