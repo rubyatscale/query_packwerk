@@ -55,6 +55,9 @@ Packages.all
 
 # Get all violations
 Violations.all
+
+# Reset the cache
+reload!
 ```
 
 ### Ruby API

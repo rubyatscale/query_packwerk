@@ -54,6 +54,11 @@ module QueryPackwerk
       def where(**query_params, &query_fn)
         QueryPackwerk::Violations.new(super(**query_params, &query_fn))
       end
+
+      sig { void }
+      def reload!
+        @all = nil
+      end
     end
 
     sig do

@@ -82,4 +82,10 @@ module QueryPackwerk
 
     "packs/#{pack_name}"
   end
+
+  sig { void }
+  def reload!
+    Packages.reload!
+    Violations.reload!
+  end
 end
