@@ -44,6 +44,11 @@ module QueryPackwerk
       def where(**query_params, &query_fn)
         QueryPackwerk::Packages.new(super)
       end
+
+      sig { void }
+      def reload!
+        @all = nil
+      end
     end
 
     sig { params(original_collection: T::Array[QueryPackwerk::Package]).void }
