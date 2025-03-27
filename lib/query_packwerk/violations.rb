@@ -83,13 +83,13 @@ module QueryPackwerk
     def load_cache!
       return true if @cache_loaded
 
-      puts "Prepopulating AST cache with #{file_count} files: "
+      warn "Prepopulating AST cache with #{file_count} files: "
       start_time = Time.now
 
       @original_collection.each(&:load_cache!)
 
       finish_time = Time.now - start_time
-      puts '', "AST cache loaded in #{finish_time}"
+      warn '', "AST cache loaded in #{finish_time}"
       @cache_loaded = true
     end
 
@@ -99,19 +99,19 @@ module QueryPackwerk
 
       unless @cache_loaded
         load_cache!
-        puts
+        warn
       end
 
-      puts "Prepopulating sources cache with #{count} violations: "
+      warn "Prepopulating sources cache with #{count} violations: "
       start_time = Time.now
 
       total_sources_loaded = @original_collection.sum do |violation|
-        print '.'
+        $stderr.print '.'
         violation.sources.size
       end
 
       finish_time = Time.now - start_time
-      puts "Loaded #{total_sources_loaded} full sources in #{finish_time}"
+      warn "Loaded #{total_sources_loaded} full sources in #{finish_time}"
 
       @sources_loaded = true
     end

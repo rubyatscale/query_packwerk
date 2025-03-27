@@ -36,14 +36,14 @@ module QueryPackwerk
     def load!(*file_names, headers: true)
       file_count = file_names.size
 
-      puts "Prepopulating AST cache with #{file_count} files: " if headers
+      warn "Prepopulating AST cache with #{file_count} files: " if headers
 
       file_names.each do |f|
         get_file_ast(f)
-        print '.'
+        $stderr.print '.'
       end
 
-      puts '', 'AST cache loaded' if headers
+      warn '', 'AST cache loaded' if headers
     end
 
     sig { params(cache_name: Symbol, key: T.untyped, value: T.untyped).returns(T.untyped) }
