@@ -13,6 +13,7 @@ require 'rubocop'
 #
 module QueryPackwerk
   autoload :Console, 'query_packwerk/console'
+  autoload :ConsoleHelpers, 'query_packwerk/console_helpers'
   autoload :QueryInterface, 'query_packwerk/query_interface'
   autoload :Violations, 'query_packwerk/violations'
   autoload :Violation, 'query_packwerk/violation'
