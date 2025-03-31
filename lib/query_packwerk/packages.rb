@@ -56,6 +56,16 @@ module QueryPackwerk
       @original_collection = original_collection
     end
 
+    sig { returns(T::Boolean) }
+    def empty?
+      @original_collection.empty?
+    end
+
+    sig { params(arg0: T.proc.params(arg0: QueryPackwerk::Package).returns(T::Boolean)).returns(T::Boolean) }
+    def any?(&block)
+      @original_collection.any?(&block)
+    end
+
     # You can query for packages rather than violations to get a broader view, and
     # the violations returned from this will be related to all packs in this class rather than just
     # one.

@@ -121,6 +121,16 @@ module QueryPackwerk
       @original_collection.sum(&:file_count)
     end
 
+    sig { returns(T::Boolean) }
+    def empty?
+      @original_collection.empty?
+    end
+
+    sig { returns(T::Boolean) }
+    def any?
+      !empty?
+    end
+
     # Gets all sources and their receiving chains grouped by the constant they've violated.
     sig { returns(T.untyped) }
     def raw_sources

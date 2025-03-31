@@ -18,6 +18,19 @@ RSpec.describe QueryPackwerk::Violations do
     end
   end
 
+  describe '#empty? and #any?' do
+    it 'returns true for empty? when there are no violations' do
+      empty_violations = described_class.new([])
+      expect(empty_violations.empty?).to be true
+      expect(empty_violations.any?).to be false
+    end
+
+    it 'returns false for empty? when there are violations' do
+      expect(described_class.all.empty?).to be false
+      expect(described_class.all.any?).to be true
+    end
+  end
+
   describe '#anonymous_sources_with_locations' do
     it 'can get anonymized sources with their file locations' do
       # { constant => { violating code shape => [where it happened] } }
