@@ -1,8 +1,10 @@
 # typed: true
+# frozen_string_literal: true
 
 module QueryPackwerk
   module ConsoleHelpers
     extend T::Sig
+    include Kernel
 
     sig { returns(String) }
     def inspect

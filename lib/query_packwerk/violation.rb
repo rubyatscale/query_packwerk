@@ -88,7 +88,7 @@ module QueryPackwerk
 
     # Whether or not the files containing violations match any provided globs
     #
-    # See also: https://ruby-doc.org/core-2.7.6/File.html#method-c-fnmatch
+    # See Ruby documentation for File.fnmatch for more details.
     sig { params(globs: T.any(String, Regexp)).returns(T::Boolean) }
     def includes_files?(*globs)
       globs.any? do |glob|
@@ -271,9 +271,6 @@ module QueryPackwerk
 
         **runtime_keys(keys)
       }
-
-      # all_values[:is_active_record] = active_record? if !keys || keys.include?(:is_active_record)
-      # all_values[:is_constant] = active_record? if !keys || keys.include?(:is_constant)
 
       keys.nil? ? all_values : all_values.slice(*T.unsafe(keys))
     end

@@ -61,9 +61,17 @@ module QueryPackwerk
       @original_collection.empty?
     end
 
-    sig { params(arg0: T.proc.params(arg0: QueryPackwerk::Package).returns(T::Boolean)).returns(T::Boolean) }
-    def any?(&block)
-      @original_collection.any?(&block)
+    sig do
+      params(
+        blk: T.nilable(T.proc.params(arg0: QueryPackwerk::Package).returns(T::Boolean))
+      ).returns(T::Boolean)
+    end
+    def any?(&blk)
+      if blk.nil?
+        !empty?
+      else
+        @original_collection.any?(&blk)
+      end
     end
 
     # You can query for packages rather than violations to get a broader view, and
@@ -78,11 +86,12 @@ module QueryPackwerk
 
     sig { returns(String) }
     def inspect
-      [
-        "#<#{self.class.name} [",
-        to_a.map(&:inspect).join("\n"),
-        ']>'
-      ].join("\n")
+      arr = to_a.map(&:inspect)
+      if arr.empty?
+        "#<#{self.class.name} []>"
+      else
+        "#<#{self.class.name} [\n#{arr.join("\n")}\n]>"
+      end
     end
   end
 end

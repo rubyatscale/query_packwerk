@@ -5,12 +5,12 @@ require 'sorbet-runtime'
 require 'parse_packwerk'
 require 'rubocop'
 
-#
 # QueryPackwerk is a tool for querying Packwerk violations.
 #
 # It is built on top of ParsePackwerk, and provides a Ruby-friendly API
 # for querying package.yml and package_todo.yml files.
 #
+# See also: https://github.com/rubyatscale/parse_packwerk
 module QueryPackwerk
   autoload :Console, 'query_packwerk/console'
   autoload :ConsoleHelpers, 'query_packwerk/console_helpers'
@@ -24,8 +24,8 @@ module QueryPackwerk
   autoload :Version, 'query_packwerk/version'
 
   extend T::Sig
-  # TODO: module_function isn't playing nicely with Sorbet
-  extend self # rubocop:todo Style/ModuleFunction
+
+  module_function
 
   sig { params(name: String).returns(T.nilable(QueryPackwerk::Package)) }
   def package(name)

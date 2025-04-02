@@ -36,8 +36,6 @@ module QueryPackwerk
     end
 
     # Should be overridden, the base of most of the queries.
-    #
-    # TODO: Consider refactoring to `abstract` interface
     sig { overridable.returns(T::Array[T.untyped]) }
     def original_collection
       []

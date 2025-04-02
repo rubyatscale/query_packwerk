@@ -31,6 +31,18 @@ RSpec.describe QueryPackwerk::Violations do
     end
   end
 
+  describe '#inspect' do
+    it 'returns a string representation of an empty collection' do
+      violations = described_class.new([])
+      expect(violations.inspect).to eq("#<#{described_class.name} []>")
+    end
+
+    it 'returns a string representation of a collection with violations' do
+      violations = described_class.all
+      expect(violations.inspect).to eq("#<#{described_class.name} [\n#{described_class.all.map(&:inspect).join("\n")}\n]>")
+    end
+  end
+
   describe '#anonymous_sources_with_locations' do
     it 'can get anonymized sources with their file locations' do
       # { constant => { violating code shape => [where it happened] } }

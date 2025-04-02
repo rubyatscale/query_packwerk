@@ -263,11 +263,12 @@ module QueryPackwerk
 
     sig { returns(String) }
     def inspect
-      [
-        "#<#{self.class.name} [",
-        to_a.map(&:inspect).join("\n"),
-        ']>'
-      ].join("\n")
+      arr = to_a.map(&:inspect)
+      if arr.empty?
+        "#<#{self.class.name} []>"
+      else
+        "#<#{self.class.name} [\n#{arr.join("\n")}\n]>"
+      end
     end
 
     private
