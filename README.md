@@ -5,16 +5,16 @@ It provides a friendly API for exploring package.yml and package_todo.yml files,
 
 ## Installation
 
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add query_packwerk
-```
-
-If bundler is not being used to manage dependencies, install the gem by executing:
+This gem provides a cli interface that can be used independently from your application.
 
 ```bash
 gem install query_packwerk
+```
+
+You can also make it available in a specific application by adding it to your Gemfile:
+
+```bash
+bundle add query_packwerk --group=development
 ```
 
 ## Usage
@@ -27,37 +27,50 @@ The easiest way to use QueryPackwerk is through its interactive console:
 query_packwerk console
 ```
 
-This will load the Packwerk context from your current directory and provide you with an interactive Ruby console with QueryPackwerk methods available.
+When the console loads, it will print a welcome message. You can access it any time with `help`:
 
-Available commands in the console:
+```
+query_packwerk:001:0> help
+```
+
+The console will use the local directory Packwerk context and provide you with all QueryPackwerk methods.
 
 ```ruby
 # Get all violations for a pack
-violations_for("pack_name")
+query_packwerk:001:0> violations_for("pack_name")
 
 # Get where violations occurred
-violation_sources_for("pack_name")
+query_packwerk:001:0> violation_sources_for("pack_name")
 
 # Get how often violations occurred
-violation_counts_for("pack_name")
+query_packwerk:001:0> violation_counts_for("pack_name")
 
 # Get the 'shape' of violations
-anonymous_violation_sources_for("pack_name")
+query_packwerk:001:0> anonymous_violation_sources_for("pack_name")
 
 # Get how often each shape occurs
-anonymous_violation_counts_for("pack_name")
+query_packwerk:001:0> anonymous_violation_counts_for("pack_name")
 
 # Get who consumes this pack
-consumers("pack_name")
+query_packwerk:001:0> consumers("pack_name")
+
+# Get a package
+query_packwerk:001:0> package("pack_name")
 
 # Get all packages
-Packages.all
+query_packwerk:001:0> Packages.all
+
+# Find a package
+query_packwerk:001:0> Packages.where(name: /service/)
 
 # Get all violations
-Violations.all
+query_packwerk:001:0> Violations.all
+
+# Find violations
+query_packwerk:001:0> Packages.where(constant_name: /Feature/, producing_pack: /service/)
 
 # Reset the cache
-reload!
+query_packwerk:001:0> reload!
 ```
 
 ### Ruby API
