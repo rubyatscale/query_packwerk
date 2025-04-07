@@ -1,6 +1,6 @@
 # QueryPackwerk
 
-QueryPackwerk is a Ruby gem for querying and analyzing Packwerk violations in Ruby applications.
+QueryPackwerk is a Ruby gem for querying and analyzing [Packwerk](https://github.com/Shopify/packwerk) violations in Ruby applications.
 It provides a friendly API for exploring package.yml and package_todo.yml files, making it easier to manage module boundaries and dependencies in your codebase.
 
 ## Installation
