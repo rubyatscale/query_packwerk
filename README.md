@@ -81,7 +81,7 @@ query_packwerk:001:0> reload!
 
 ### Ruby API
 
-You can also use QueryPackwerk programmatically in your Ruby code:
+QueryPackwerk can also be used programmatically from Ruby:
 
 ```ruby
 require 'query_packwerk'
