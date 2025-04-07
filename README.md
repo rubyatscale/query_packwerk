@@ -1,11 +1,11 @@
 # QueryPackwerk
 
-QueryPackwerk is a Ruby gem for querying and analyzing Packwerk violations in Ruby applications.
-It provides a friendly API for exploring package.yml and package_todo.yml files, making it easier to manage module boundaries and dependencies in your codebase.
+QueryPackwerk is a Ruby gem for querying and analyzing [Packwerk](https://github.com/Shopify/packwerk) violations in Ruby applications.
+It provides a friendly API for exploring `package.yml` and `package_todo.yml` files, making it easier to manage module boundaries and dependencies in your codebase.
 
 ## Installation
 
-This gem provides a cli interface that can be used independently from your application.
+This gem provides a CLI interface that can be used independently from your application.
 
 ```bash
 gem install query_packwerk
@@ -21,19 +21,32 @@ bundle add query_packwerk --group=development
 
 ### Console Interface
 
-The easiest way to use QueryPackwerk is through its interactive console:
+The easiest way to use QueryPackwerk is through its interactive console. This will use the local directory Packwerk context and provide you with all QueryPackwerk methods.
 
 ```bash
 query_packwerk console
 ```
 
-When the console loads, it will print a welcome message. You can access it any time with `help`:
+The CLI includes a welcome message with a list of commands. You can access it any time with `welcome`:
 
 ```
-query_packwerk:001:0> help
+query_packwerk:001:0> welcome
 ```
 
-The console will use the local directory Packwerk context and provide you with all QueryPackwerk methods.
+Find packages to work with:
+
+```ruby
+# Get a package
+query_packwerk:001:0> package("pack_name")
+
+# Get all packages
+query_packwerk:001:0> Packages.all
+
+# Find a package
+query_packwerk:001:0> Packages.where(name: /service/)
+```
+
+Explore violations:
 
 ```ruby
 # Get all violations for a pack
@@ -54,28 +67,21 @@ query_packwerk:001:0> anonymous_violation_counts_for("pack_name")
 # Get who consumes this pack
 query_packwerk:001:0> consumers("pack_name")
 
-# Get a package
-query_packwerk:001:0> package("pack_name")
-
-# Get all packages
-query_packwerk:001:0> Packages.all
-
-# Find a package
-query_packwerk:001:0> Packages.where(name: /service/)
-
 # Get all violations
 query_packwerk:001:0> Violations.all
 
-# Find violations
-query_packwerk:001:0> Packages.where(constant_name: /Feature/, producing_pack: /service/)
+```
 
+If you change any of the package.yml or package_todo.yml files, you can reload the running console:
+
+```ruby
 # Reset the cache
 query_packwerk:001:0> reload!
 ```
 
 ### Ruby API
 
-You can also use QueryPackwerk programmatically in your Ruby code:
+QueryPackwerk can also be used programmatically from Ruby:
 
 ```ruby
 require 'query_packwerk'
