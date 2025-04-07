@@ -30,7 +30,7 @@ query_packwerk console
 The CLI includes a welcome message with a list of commands. You can access it any time with `welcome`:
 
 ```
-query_packwerk:001:0> help
+query_packwerk:001:0> welcome
 ```
 
 Find packages to work with:
