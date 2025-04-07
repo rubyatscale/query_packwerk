@@ -27,7 +27,7 @@ The easiest way to use QueryPackwerk is through its interactive console. This wi
 query_packwerk console
 ```
 
-The CLI includes a welcome message with a list of commands. You can access it any time with `help`:
+The CLI includes a welcome message with a list of commands. You can access it any time with `welcome`:
 
 ```
 query_packwerk:001:0> help
