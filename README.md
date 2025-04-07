@@ -21,7 +21,7 @@ bundle add query_packwerk --group=development
 
 ### Console Interface
 
-The easiest way to use QueryPackwerk is through its interactive console:
+The easiest way to use QueryPackwerk is through its interactive console. This will use the local directory Packwerk context and provide you with all QueryPackwerk methods.
 
 ```bash
 query_packwerk console
@@ -32,11 +32,6 @@ When the console loads, it will print a welcome message. You can access it any t
 ```
 query_packwerk:001:0> help
 ```
-
-The console will use the local directory Packwerk context and provide you with all QueryPackwerk methods.
-
-The console can help you find a package to query:
-
 
 ```ruby
 # Get a package
