@@ -6,7 +6,7 @@
 
 module ::DateAndTime::Calculations; end
 module ::DateAndTime::Zones; end
-module ActionView::ActionViewError; end
+class ActionView::ActionViewError < StandardError; end
 module ActionView::Helpers::SanitizeHelper::ClassMethods; end
 module ActionView::Helpers::TagHelper; end
 module ActionView::Helpers::UrlHelper::ClassMethods; end

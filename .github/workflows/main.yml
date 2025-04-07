@@ -8,15 +8,15 @@ on:
   pull_request:
 
 jobs:
-  rspec:
-    name: Ruby ${{ matrix.ruby }}
+  tests:
+    name: Tests Ruby ${{ matrix.ruby }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         ruby:
           - '3.3'
           - '3.4'
-          - 'head'
 
     steps:
       - uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
       - name: Run tests
         run: bundle exec rspec
 
-  static_type_check:
+  type_check:
     name: "Type Check"
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +37,19 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          ruby-version: head
+          ruby-version: '3.4'
       - name: Run static type checks
         run: bundle exec srb tc
+
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: '3.4'
+      - name: Run static type checks
+        run: bundle exec rubocop
