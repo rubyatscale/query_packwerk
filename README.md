@@ -5,7 +5,7 @@ It provides a friendly API for exploring `package.yml` and `package_todo.yml` fi
 
 ## Installation
 
-This gem provides a cli interface that can be used independently from your application.
+This gem provides a CLI interface that can be used independently from your application.
 
 ```bash
 gem install query_packwerk
@@ -35,7 +35,19 @@ query_packwerk:001:0> help
 
 The console will use the local directory Packwerk context and provide you with all QueryPackwerk methods.
 
+The console can help you find a package to query:
+
+
 ```ruby
+# Get a package
+query_packwerk:001:0> package("pack_name")
+
+# Get all packages
+query_packwerk:001:0> Packages.all
+
+# Find a package
+query_packwerk:001:0> Packages.where(name: /service/)
+
 # Get all violations for a pack
 query_packwerk:001:0> violations_for("pack_name")
 
@@ -54,20 +66,8 @@ query_packwerk:001:0> anonymous_violation_counts_for("pack_name")
 # Get who consumes this pack
 query_packwerk:001:0> consumers("pack_name")
 
-# Get a package
-query_packwerk:001:0> package("pack_name")
-
-# Get all packages
-query_packwerk:001:0> Packages.all
-
-# Find a package
-query_packwerk:001:0> Packages.where(name: /service/)
-
 # Get all violations
 query_packwerk:001:0> Violations.all
-
-# Find violations
-query_packwerk:001:0> Packages.where(constant_name: /Feature/, producing_pack: /service/)
 
 # Reset the cache
 query_packwerk:001:0> reload!
