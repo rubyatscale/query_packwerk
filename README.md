@@ -27,11 +27,13 @@ The easiest way to use QueryPackwerk is through its interactive console. This wi
 query_packwerk console
 ```
 
-When the console loads, it will print a welcome message. You can access it any time with `help`:
+The CLI includes a welcome message with a list of commands. You can access it any time with `help`:
 
 ```
 query_packwerk:001:0> help
 ```
+
+Find packages to work with:
 
 ```ruby
 # Get a package
@@ -42,7 +44,11 @@ query_packwerk:001:0> Packages.all
 
 # Find a package
 query_packwerk:001:0> Packages.where(name: /service/)
+```
 
+Explore violations:
+
+```ruby
 # Get all violations for a pack
 query_packwerk:001:0> violations_for("pack_name")
 
@@ -64,6 +70,11 @@ query_packwerk:001:0> consumers("pack_name")
 # Get all violations
 query_packwerk:001:0> Violations.all
 
+```
+
+If you change any of the package.yml or package_todo.yml files, you can reload the running console:
+
+```ruby
 # Reset the cache
 query_packwerk:001:0> reload!
 ```
