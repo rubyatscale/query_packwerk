@@ -11,6 +11,7 @@ jobs:
   tests:
     name: Tests Ruby ${{ matrix.ruby }}
     runs-on: ubuntu-latest
+    environment: ci
     strategy:
       fail-fast: false
       matrix:
@@ -31,6 +32,7 @@ jobs:
   type_check:
     name: "Type Check"
     runs-on: ubuntu-latest
+    environment: ci
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
@@ -44,6 +46,7 @@ jobs:
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
+    environment: ci
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
