@@ -48,4 +48,4 @@ jobs:
           git commit -am "Bump version to ${{ steps.version.outputs.bump }}"
           VERSION=$(ruby -e "require './lib/${{ env.GEM_NAME }}/version'; puts ${{ env.GEM_CLASS_NAME }}::VERSION")
           git tag "v$VERSION"
-          git push --follow-tags
+          git push origin main "v$VERSION"
