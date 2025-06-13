@@ -43,9 +43,11 @@ jobs:
 
       - name: Commit and tag version bump
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git commit -am "Bump version to ${{ steps.version.outputs.bump }}"
+          # Attribute commits to the last committer on HEAD
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git remote set-url origin "https://x-access-token:${{ github.token }}@github.com/$GITHUB_REPOSITORY"
           VERSION=$(ruby -e "require './lib/${{ env.GEM_NAME }}/version'; puts ${{ env.GEM_CLASS_NAME }}::VERSION")
+          git commit -am "Bump version to $VERSION"
           git tag "v$VERSION"
           git push origin main "v$VERSION"
