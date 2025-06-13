@@ -9,6 +9,10 @@ on:
     types: [closed]
     branches: [main]
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   release:
     if: github.event.pull_request.merged == true
