@@ -2,5 +2,5 @@
 # frozen_string_literal: true
 
 module QueryPackwerk
-  VERSION = '0.2.0.pre'
+  VERSION = '0.2.1.pre'
 end
