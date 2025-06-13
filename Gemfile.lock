@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    query_packwerk (0.2.2.pre)
+    query_packwerk (0.1.0)
       coderay
       packwerk
       parse_packwerk
