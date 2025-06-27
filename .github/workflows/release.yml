@@ -1,19 +1,58 @@
-name: Release Gem
+name: Tag and Release Gem
+
+env:
+  GEM_NAME: query_packwerk
+  GEM_CLASS_NAME: QueryPackwerk
 
 on:
-  push:
-    tags:
-      - v*
+  pull_request:
+    types: [closed]
+    branches: [main]
 
 permissions:
-  contents: read
+  contents: write
+  actions: read
 
 jobs:
-  push:
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      github.repository == 'rubyatscale/query_packwerk' &&
-      startsWith(github.ref, 'refs/tags/v')
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+
+      - name: Determine release type
+        id: version
+        run: |
+          if [[ "${{ github.event.pull_request.labels[*] }}" == *"major"* ]]; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.pull_request.labels[*] }}" == *"minor"* ]]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          else
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump version
+        run: |
+          gem install bump
+          bump ${{ steps.version.outputs.bump }}
+
+      - name: Commit and tag version bump
+        run: |
+          # Attribute commits to the last committer on HEAD
+          git config --global user.email "$(git log -1 --pretty=format:'%ae')"
+          git config --global user.name "$(git log -1 --pretty=format:'%an')"
+          git remote set-url origin "https://x-access-token:${{ github.token }}@github.com/$GITHUB_REPOSITORY"
+          VERSION=$(ruby -e "require './lib/${{ env.GEM_NAME }}/version'; puts ${{ env.GEM_CLASS_NAME }}::VERSION")
+          git commit -am "Bump version to $VERSION"
+          git tag "v$VERSION"
+          git push origin main "v$VERSION"
+  release:
+    if: github.repository == 'rubyatscale/query_packwerk'
     runs-on: ubuntu-latest
     environment: release
     permissions:
