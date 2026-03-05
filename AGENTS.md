@@ -1,5 +1,3 @@
-# AGENTS.md
-
 This file provides guidance to AI coding agents when working with code in this repository.
 
 ## What this project is
@@ -29,4 +27,4 @@ bundle exec srb tc
 
 - `lib/query_packwerk.rb` — entry point and public API
 - `lib/query_packwerk/` — query classes for violations, packages, and dependency graphs; also includes an interactive console (REPL) interface
-- `spec/` — RSpec tests; `spec/fixtures/` holds sample packwerk app structures
+- `spec/` — RSpec tests
