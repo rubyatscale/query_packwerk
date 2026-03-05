@@ -74,7 +74,7 @@ module QueryPackwerk
                                  end
     end
 
-    # Get all occurrencs of the violation's constant in a file
+    # Get all occurrences of the violation's constant in a file
     sig { params(file_name: String, class_name: String).returns(T::Array[RuboCop::AST::Node]) }
     def get_all_const_occurrences(file_name:, class_name:)
       const_key = [file_name, class_name]

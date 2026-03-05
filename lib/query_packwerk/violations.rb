@@ -159,7 +159,7 @@ module QueryPackwerk
     end
 
     # Instead of getting all instances of the source, count how often each occurs, with the option to
-    # provide a threshold to remove lower-occuring items.
+    # provide a threshold to remove lower-occurring items.
     sig { params(threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
     def source_counts(threshold: 0)
       load_sources!
