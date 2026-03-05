@@ -139,8 +139,8 @@ module QueryPackwerk
       RuboCop::ProcessedSource.new(string, RUBY_VERSION.to_f).ast
     end
 
-    # We can find a constant, but by going up its parents we can find out the full call chain
-    # by checking if each parent is a receiver of the child, giving us method calls and
+    # We can find a constant, but by going up its parents we can find the full call chain.
+    # We check if each parent is a receiver of the child, giving us method calls and
     # arguments on a constant as well as where it occurred.
     sig { params(node: RuboCop::AST::Node).returns(RuboCop::AST::Node) }
     def get_full_receiver_chain(node)

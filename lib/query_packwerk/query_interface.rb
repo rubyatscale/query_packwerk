@@ -125,7 +125,7 @@ module QueryPackwerk
           end
         end
       end
-      # Similar to the above `original_collection` we want to override this by defining
+      # Similar to the above `original_collection`, we want to override this by defining
       # where the InheritingClass can find all of its raw data.
       #
       # Sorbet does not recognize `included(klass)`/`klass.extend(ClassMethods)` when

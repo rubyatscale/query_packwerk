@@ -188,7 +188,7 @@ module QueryPackwerk
       end
     end
 
-    # Like above frequency of sources, except by method "shape" rather than
+    # Like the above source frequency, except grouped by method "shape" rather than
     # exact arguments
     sig { returns(T::Hash[String, Integer]) }
     def anonymous_source_counts
