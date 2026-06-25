@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    query_packwerk (0.1.10)
+    query_packwerk (0.1.11)
       coderay
       packwerk
       parse_packwerk
@@ -232,4 +232,4 @@ DEPENDENCIES
   tapioca
 
 BUNDLED WITH
-   4.0.15
+  4.0.15
