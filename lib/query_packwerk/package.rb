@@ -21,13 +21,15 @@ module QueryPackwerk
       @original_package.name
     end
 
+    # Mirrors packwerk's public API naming, so it can't take a `?` suffix.
     sig { returns(T::Boolean) }
-    def enforce_dependencies
+    def enforce_dependencies # rubocop:disable Naming/PredicateMethod
       !!@original_package.enforce_dependencies
     end
 
+    # Mirrors packwerk's public API naming, so it can't take a `?` suffix.
     sig { returns(T::Boolean) }
-    def enforce_privacy
+    def enforce_privacy # rubocop:disable Naming/PredicateMethod
       !!@original_package.enforce_privacy
     end
 
