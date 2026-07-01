@@ -4,30 +4,9 @@ on:
   push:
     branches:
       - main
-
   pull_request:
 
 jobs:
-  tests:
-    name: Tests Ruby ${{ matrix.ruby }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby:
-          - '3.3'
-          - '3.4'
-
-    steps:
-      - uses: actions/checkout@v7.0.0
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
-      - name: Run static type checks
-        run: bundle exec srb tc
-      - name: Run lint
-        run: bundle exec rubocop
-      - name: Run tests
-        run: bundle exec rspec
+  call-workflow-from-shared-config:
+    uses: rubyatscale/shared-config/.github/workflows/ci.yml@main
+    secrets: inherit
