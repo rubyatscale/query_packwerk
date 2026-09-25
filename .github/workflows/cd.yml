@@ -1,0 +1,14 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  call-workflow-from-shared-config:
+    permissions:
+      contents: write
+    uses: rubyatscale/shared-config/.github/workflows/cd.yml@main
+    secrets: inherit
