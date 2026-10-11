@@ -9,8 +9,6 @@ module QueryPackwerk
   class Violation
     extend T::Sig
 
-    # This does not play nicely with ERB files which may have violations
-    RUBY_FILE = T.let(/\.(rb|rake)\z/, Regexp)
     ALL_CAPS = T.let(/\A[A-Z_]+\z/, Regexp)
 
     sig { returns(QueryPackwerk::Package) }
