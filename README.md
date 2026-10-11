@@ -27,6 +27,14 @@ The easiest way to use QueryPackwerk is through its interactive console. This wi
 query_packwerk console
 ```
 
+To use the Packwerk context of another directory, pass it as an argument:
+
+```bash
+query_packwerk console path/to/app
+```
+
+Run `query_packwerk console --help` for usage details.
+
 The CLI includes a welcome message with a list of commands. You can access it any time with `welcome`:
 
 ```
