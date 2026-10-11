@@ -4,12 +4,22 @@
 require 'tmpdir'
 require 'query_packwerk/cli'
 
+# RSpec doesn't rescue SystemExit, so an unexpected exit from Thor would abort
+# the whole run. raise_error does rescue it, which turns that into a failure.
+RSpec::Matchers.define_negated_matcher :not_raise_error, :raise_error
+
 RSpec.describe QueryPackwerk::CLI do
   before do
     allow(QueryPackwerk::Console).to receive(:start)
   end
 
   describe 'console' do
+    it 'is the default command' do
+      described_class.start([])
+
+      expect(QueryPackwerk::Console).to have_received(:start).with(Dir.pwd)
+    end
+
     it 'starts the console in the current directory by default' do
       described_class.start(%w[console])
 
@@ -32,6 +42,19 @@ RSpec.describe QueryPackwerk::CLI do
       expect(QueryPackwerk::Console).not_to have_received(:start)
     end
 
+    it 'exits with an error when the path is a file' do
+      Dir.mktmpdir do |directory|
+        file = File.join(directory, 'package.yml')
+        File.write(file, '')
+
+        expect { described_class.start(['console', file]) }
+          .to output(%(Could not find directory #{file.inspect}.\n)).to_stderr
+          .and raise_error(SystemExit) { |error| expect(error.status).to eq(1) }
+      end
+
+      expect(QueryPackwerk::Console).not_to have_received(:start)
+    end
+
     it 'exits with an error when given an unknown option' do
       expect { described_class.start(%w[console --foo]) }
         .to output(/Unknown switches "--foo"/).to_stderr
@@ -42,11 +65,21 @@ RSpec.describe QueryPackwerk::CLI do
 
     %w[--help -h].each do |flag|
       it "prints usage for #{flag} instead of starting the console" do
+        # Thor wraps long_desc to the terminal width, hence \s+ between words.
         expect { described_class.start(['console', flag]) }
-          .to output(/console \[DIRECTORY\].*Query packwerk in DIRECTORY via console \(defaults to the current directory\)/m).to_stdout
+          .to output(/\AUsage:\n  \S+ console \[DIRECTORY\]\n.*DIRECTORY\s+defaults\s+to\s+the\s+current\s+directory/m).to_stdout
+          .and not_raise_error
 
         expect(QueryPackwerk::Console).not_to have_received(:start)
       end
+    end
+
+    it 'prints usage for --help even when the directory does not exist' do
+      expect { described_class.start(%w[console --help does/not/exist]) }
+        .to output(/\AUsage:/).to_stdout
+        .and not_raise_error
+
+      expect(QueryPackwerk::Console).not_to have_received(:start)
     end
   end
 end

@@ -8,8 +8,9 @@ module QueryPackwerk
   class CLI < Thor
     extend T::Sig
 
-    # Thor only maps --help to its help command when it comes before the
-    # command name, so each command checks options[:help] itself.
+    # Thor only maps --help to its help command when it is the first argument.
+    # Anywhere else it is an ordinary option, so each command checks
+    # options[:help] itself.
     class_option :help, type: :boolean, aliases: '-h', desc: 'Show this help message'
     check_unknown_options!
 
@@ -20,8 +21,8 @@ module QueryPackwerk
       true
     end
 
-    desc 'console [DIRECTORY]',
-         'Query packwerk in DIRECTORY via console (defaults to the current directory)'
+    desc 'console [DIRECTORY]', 'Query packwerk in DIRECTORY via console'
+    long_desc 'Query packwerk in DIRECTORY via console. DIRECTORY defaults to the current directory.'
     sig { params(directory: String).void }
     def console(directory = Dir.pwd)
       return help('console') if options[:help]
