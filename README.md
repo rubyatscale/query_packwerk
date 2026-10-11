@@ -27,6 +27,14 @@ The easiest way to use QueryPackwerk is through its interactive console. This wi
 query_packwerk console
 ```
 
+To use the Packwerk context of another directory, pass it as an argument:
+
+```bash
+query_packwerk console path/to/app
+```
+
+Run `query_packwerk console --help` for usage details.
+
 The CLI includes a welcome message with a list of commands. You can access it any time with `welcome`:
 
 ```
@@ -116,7 +124,7 @@ QueryPackwerk.anonymous_violation_counts_for("my_pack", threshold: 3)
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, push a PR with the label for the version you want, like 'major', 'minor' or 'patch'. When the PR is merged, the version will be automatically released to RubyGems.
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, bump `VERSION` in `lib/query_packwerk/version.rb` in your PR and run `bundle install` so `Gemfile.lock` matches. When the PR is merged and CI passes on `main`, the gem is tagged and published to RubyGems automatically. Merges that don't change the version don't publish anything.
 
 ## Contributing
 
