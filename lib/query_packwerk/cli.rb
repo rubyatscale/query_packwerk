@@ -8,9 +8,7 @@ module QueryPackwerk
   class CLI < Thor
     extend T::Sig
 
-    # Thor only maps --help to its help command when it is the first argument.
-    # Anywhere else it is an ordinary option, so each command checks
-    # options[:help] itself.
+    # Thor maps --help to its help command only as the first argument, so commands check options[:help].
     class_option :help, type: :boolean, aliases: '-h', desc: 'Show this help message'
     check_unknown_options!
 

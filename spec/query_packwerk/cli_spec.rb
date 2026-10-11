@@ -4,8 +4,7 @@
 require 'tmpdir'
 require 'query_packwerk/cli'
 
-# RSpec doesn't rescue SystemExit, so an unexpected exit from Thor would abort
-# the whole run. raise_error does rescue it, which turns that into a failure.
+# An uncaught SystemExit aborts the rspec run; raise_error rescues it into a failure.
 RSpec::Matchers.define_negated_matcher :not_raise_error, :raise_error
 
 RSpec.describe QueryPackwerk::CLI do
