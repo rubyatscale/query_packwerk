@@ -69,7 +69,7 @@ module QueryPackwerk
     end
     def initialize(original_collection, file_cache: QueryPackwerk::FileCache.new)
       @original_collection = original_collection
-      @file_cache = T.let(file_cache, QueryPackwerk::FileCache)
+      @file_cache = file_cache
 
       @original_collection.each do |violation|
         violation.set_cache!(file_cache)

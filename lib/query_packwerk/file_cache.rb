@@ -10,8 +10,8 @@ module QueryPackwerk
     extend T::Sig
 
     # The files packwerk parses as Ruby, from Packwerk::Parsers::Factory
-    RUBY_FILE = T.let(/(\.(rb|rake|builder|gemspec|ru)|Gemfile|Rakefile)\z/, Regexp)
-    ERB_FILE = T.let(/\.erb\z/, Regexp)
+    RUBY_FILE = /(\.(rb|rake|builder|gemspec|ru)|Gemfile|Rakefile)\z/
+    ERB_FILE = /\.erb\z/
 
     sig { void }
     def initialize
