@@ -9,7 +9,9 @@ module QueryPackwerk
   class FileCache
     extend T::Sig
 
-    RUBY_FILE = T.let(/\.(rb|rake)\z/, Regexp)
+    # The files packwerk parses as Ruby, from Packwerk::Parsers::Factory
+    RUBY_FILE = T.let(/(\.(rb|rake|builder|gemspec|ru)|Gemfile|Rakefile)\z/, Regexp)
+    ERB_FILE = T.let(/\.erb\z/, Regexp)
 
     sig { void }
     def initialize
@@ -62,12 +64,18 @@ module QueryPackwerk
 
     sig { params(file_name: String).returns(RuboCop::AST::Node) }
     def get_file_ast(file_name)
-      @file_ast_cache[file_name] ||= ast_from(get_file(file_name))
+      @file_ast_cache[file_name] ||= begin
+        source = processed_source(ruby_source(file_name))
+        warn_unparseable(file_name, source) unless source.valid_syntax?
+
+        # The AST is also nil for source with no code, like a template that's only HTML
+        source.ast || ast_from('x')
+      end
     end
 
     sig { params(file_name: String).returns(String) }
     def get_file(file_name)
-      @file_cache[file_name] ||= if RUBY_FILE.match?(file_name) && File.exist?(file_name)
+      @file_cache[file_name] ||= if (RUBY_FILE.match?(file_name) || ERB_FILE.match?(file_name)) && File.exist?(file_name)
                                    File.read(file_name)
                                  else
                                    'x'
@@ -84,7 +92,7 @@ module QueryPackwerk
       absolute_const_node = ast_from(class_name)
       relative_const_node = ast_from(class_name.delete_prefix('::'))
 
-      @file_const_cache[const_key] = get_file_ast(file_name).each_descendant.select do |node|
+      @file_const_cache[const_key] = get_file_ast(file_name).each_node.select do |node|
         next false unless node.const_type?
 
         node == absolute_const_node || node == relative_const_node
@@ -133,10 +141,32 @@ module QueryPackwerk
 
     private
 
+    # Blanks out everything in an ERB template except its Ruby code, so line numbers still match the template
+    sig { params(file_name: String).returns(String) }
+    def ruby_source(file_name)
+      source = get_file(file_name)
+      return source unless ERB_FILE.match?(file_name)
+
+      Herb.extract_ruby(source, semicolons: true, comments: false, preserve_positions: true)
+    end
+
+    sig { params(string: String).returns(RuboCop::ProcessedSource) }
+    def processed_source(string)
+      RuboCop::ProcessedSource.new(string, RUBY_VERSION.to_f)
+    end
+
+    sig { params(file_name: String, source: RuboCop::ProcessedSource).void }
+    def warn_unparseable(file_name, source)
+      error = source.diagnostics.find { |diagnostic| diagnostic.level == :error }
+      location = error ? "#{file_name}:#{error.location.line} (#{error.message})" : file_name
+
+      warn "Could not parse #{location}, so its violations are not included"
+    end
+
     # Turns a string into a Ruby AST
     sig { params(string: String).returns(RuboCop::AST::Node) }
     def ast_from(string)
-      RuboCop::ProcessedSource.new(string, RUBY_VERSION.to_f).ast
+      processed_source(string).ast
     end
 
     # We can find a constant, but by going up its parents we can find the full call chain.

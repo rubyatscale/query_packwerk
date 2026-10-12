@@ -79,4 +79,21 @@ RSpec.describe QueryPackwerk::Violations do
       )
     end
   end
+
+  describe '#sources_with_contexts' do
+    it 'shows the given number of lines around each source' do
+      contexts = described_class.all.sources_with_contexts(start_offset: 1, end_offset: 0)
+
+      expect(contexts['::Backfills::BackfillPollinationCoveredPeriodDates']).to eq(
+        'Backfills::BackfillPollinationCoveredPeriodDates.run!' => [
+          <<~CONTEXT
+            > db/data/20210309211702_backfill_pollination_covered_period_dates.rb:3 (L2..3)
+
+            def up
+              Backfills::BackfillPollinationCoveredPeriodDates.run!
+          CONTEXT
+        ]
+      )
+    end
+  end
 end

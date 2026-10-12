@@ -192,7 +192,9 @@ module QueryPackwerk
     def sources_with_contexts(start_offset: 3, end_offset: 3)
       load_sources!
 
-      deep_merge_hash_groups(@original_collection) { |v| [v.class_name, v.sources_with_contexts] }
+      deep_merge_hash_groups(@original_collection) do |v|
+        [v.class_name, v.sources_with_contexts(start_offset:, end_offset:)]
+      end
     end
 
     sig { params(start_offset: Integer, end_offset: Integer).returns(String) }

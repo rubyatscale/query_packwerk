@@ -9,8 +9,6 @@ module QueryPackwerk
   class Violation
     extend T::Sig
 
-    # This does not play nicely with ERB files which may have violations
-    RUBY_FILE = T.let(/\.(rb|rake)\z/, Regexp)
     ALL_CAPS = T.let(/\A[A-Z_]+\z/, Regexp)
 
     sig { returns(QueryPackwerk::Package) }
@@ -168,13 +166,15 @@ module QueryPackwerk
       load_cache!
 
       file_sources = files.flat_map do |file_name|
+        lines = @file_cache.get_file(file_name).lines
+
         @file_cache.get_full_sources(file_name: file_name, class_name: class_name).map do |s|
           line_number = s.loc.line
-          start_pos = line_number - start_offset
-          end_pos = line_number + end_offset
+          start_pos = [line_number - start_offset, 1].max
+          end_pos = [line_number + end_offset, lines.size].min
 
           location = "#{file_name}:#{s.loc.line} (L#{start_pos}..#{end_pos})"
-          context = @file_cache.get_file(file_name).lines.slice(start_pos..end_pos)
+          context = lines[(start_pos - 1)...end_pos]
           full_context = unindent((context || ['']).join)
 
           [@file_cache.anonymize_arguments(s.source), "> #{location}\n\n#{full_context}"]

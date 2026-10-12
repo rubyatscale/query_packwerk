@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'coderay'
+  spec.add_dependency 'herb', '>= 0.9'
   spec.add_dependency 'packwerk'
   spec.add_dependency 'parse_packwerk'
   spec.add_dependency 'rubocop'
