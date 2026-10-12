@@ -14,7 +14,7 @@ gem 'rake', '~> 13.0'
 gem 'rspec', '~> 3.0'
 
 gem 'rubocop', '~> 1.74'
-gem 'rubocop-performance', '~> 1.24'
+gem 'rubocop-performance', '~> 1.27'
 gem 'rubocop-sorbet', '~> 0.9'
 
 gem 'sorbet'
