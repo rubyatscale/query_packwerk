@@ -15,7 +15,7 @@ gem 'rspec', '~> 3.0'
 
 gem 'rubocop', '~> 1.74'
 gem 'rubocop-performance', '~> 1.24'
-gem 'rubocop-sorbet', '~> 0.9'
+gem 'rubocop-sorbet', '~> 0.16'
 
 gem 'sorbet'
 gem 'tapioca'
