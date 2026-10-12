@@ -66,9 +66,9 @@ module QueryPackwerk
     def get_file_ast(file_name)
       @file_ast_cache[file_name] ||= begin
         source = processed_source(ruby_source(file_name))
-        warn "Could not parse #{file_name}, so its violations are not included" unless source.valid_syntax?
+        warn_unparseable(file_name, source) unless source.valid_syntax?
 
-        # Source with no code (only comments, or a template that's only HTML) has no AST either
+        # The AST is also nil for source with no code, like a template that's only HTML
         source.ast || ast_from('x')
       end
     end
@@ -92,7 +92,7 @@ module QueryPackwerk
       absolute_const_node = ast_from(class_name)
       relative_const_node = ast_from(class_name.delete_prefix('::'))
 
-      @file_const_cache[const_key] = get_file_ast(file_name).each_descendant.select do |node|
+      @file_const_cache[const_key] = get_file_ast(file_name).each_node.select do |node|
         next false unless node.const_type?
 
         node == absolute_const_node || node == relative_const_node
@@ -153,6 +153,14 @@ module QueryPackwerk
     sig { params(string: String).returns(RuboCop::ProcessedSource) }
     def processed_source(string)
       RuboCop::ProcessedSource.new(string, RUBY_VERSION.to_f)
+    end
+
+    sig { params(file_name: String, source: RuboCop::ProcessedSource).void }
+    def warn_unparseable(file_name, source)
+      error = source.diagnostics.find { |diagnostic| diagnostic.level == :error }
+      location = error ? "#{file_name}:#{error.location.line} (#{error.message})" : file_name
+
+      warn "Could not parse #{location}, so its violations are not included"
     end
 
     # Turns a string into a Ruby AST

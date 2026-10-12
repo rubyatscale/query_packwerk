@@ -4,9 +4,9 @@
 RSpec.describe QueryPackwerk::FileCache do
   subject(:file_cache) { described_class.new }
 
-  def sources_in(file_name)
+  def sources_in(file_name, class_name: '::Billing::Invoice')
     file_cache
-      .get_full_sources(file_name: file_name, class_name: '::Billing::Invoice')
+      .get_full_sources(file_name: file_name, class_name: class_name)
       .map { |node| [node.loc.line, node.source] }
   end
 
@@ -35,37 +35,71 @@ RSpec.describe QueryPackwerk::FileCache do
       )
     end
 
-    it 'finds nothing in an ERB template without Ruby code' do
+    %w[app/views/invoices/show.js.erb app/views/invoices/show.erb].each do |file_name|
+      it "finds references in #{file_name}" do
+        write_file(file_name, "var count = <%= Billing::Invoice.count %>;\n")
+
+        expect(sources_in(file_name)).to eq([[1, 'Billing::Invoice.count']])
+      end
+    end
+
+    it 'finds a reference that is the only code in a template' do
+      write_file('app/views/invoices/_name.html.erb', "<p><%= Billing::Invoice %></p>\n")
+
+      expect(sources_in('app/views/invoices/_name.html.erb')).to eq([[1, 'Billing::Invoice']])
+    end
+
+    it 'finds nothing, without a warning, in an ERB template without Ruby code' do
       write_file('app/views/pages/about.html.erb', "<p>About</p>\n")
 
-      sources = nil
-      expect { sources = sources_in('app/views/pages/about.html.erb') }.not_to output.to_stderr
-      expect(sources).to eq([])
+      expect { sources_in('app/views/pages/about.html.erb') }.not_to output.to_stderr
+      expect(sources_in('app/views/pages/about.html.erb')).to eq([])
     end
 
-    it 'finds nothing in a Ruby file with only comments' do
+    it 'finds nothing, without a warning, in a Ruby file with only comments' do
       write_file('app/models/invoice.rb', "# frozen_string_literal: true\n")
 
-      sources = nil
-      expect { sources = sources_in('app/models/invoice.rb') }.not_to output.to_stderr
-      expect(sources).to eq([])
+      expect { sources_in('app/models/invoice.rb') }.not_to output.to_stderr
+      expect(sources_in('app/models/invoice.rb')).to eq([])
     end
 
-    it 'warns that it found nothing in a file it could not parse' do
-      write_file('app/models/invoice.rb', "Billing::Invoice.find(\n")
-
-      sources = nil
-      expect { sources = sources_in('app/models/invoice.rb') }
-        .to output("Could not parse app/models/invoice.rb, so its violations are not included\n").to_stderr
-      expect(sources).to eq([])
+    %w[app/models/invoice.rb app/views/invoices/show.html.erb].each do |file_name|
+      it "finds nothing, without a warning, when #{file_name} does not exist" do
+        expect { sources_in(file_name) }.not_to output.to_stderr
+        expect(sources_in(file_name)).to eq([])
+      end
     end
 
-    %w[app/views/invoices/show.xml.builder billing.gemspec config.ru Gemfile Rakefile].each do |file_name|
+    it 'warns, once, that it found nothing in a file it could not parse' do
+      write_file('app/views/invoices/show.html.erb', <<~ERB)
+        <% if Billing::Invoice.overdue?(@account) %>
+          <p>Overdue</p>
+        <% end %>
+        <% end %>
+      ERB
+
+      expect do
+        sources_in('app/views/invoices/show.html.erb')
+        sources_in('app/views/invoices/show.html.erb', class_name: '::Billing::Payment')
+      end.to output(%r{\ACould not parse app/views/invoices/show\.html\.erb:4 \(.+\), so its violations are not included\n\z})
+        .to_stderr
+      expect(sources_in('app/views/invoices/show.html.erb')).to eq([])
+    end
+
+    %w[
+      lib/tasks/billing.rake app/views/invoices/show.xml.builder billing.gemspec config.ru Gemfile Rakefile
+    ].each do |file_name|
       it "finds references in #{file_name}" do
         write_file(file_name, "Billing::Invoice.find(1)\n")
 
         expect(sources_in(file_name)).to eq([[1, 'Billing::Invoice.find(1)']])
       end
+    end
+
+    it 'finds nothing in a file that packwerk does not parse' do
+      write_file('Gemfile.lock', "Billing::Invoice.find(1)\n")
+
+      expect(sources_in('Gemfile.lock')).to eq([])
     end
   end
 end
