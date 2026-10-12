@@ -38,8 +38,10 @@ RSpec.describe QueryPackwerk::Violation do
     end
 
     it 'shows context from the template rather than the extracted Ruby' do
-      expect(violation.sources_with_contexts.values.flatten)
-        .to all(include('<% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>'))
+      contexts = violation.sources_with_contexts.values.flatten
+
+      expect(contexts.size).to eq(2)
+      expect(contexts).to all(include('<% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>'))
     end
 
     it 'shows the lines around each reference' do
