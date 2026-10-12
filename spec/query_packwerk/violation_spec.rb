@@ -18,9 +18,8 @@ RSpec.describe QueryPackwerk::Violation do
     end
 
     let(:template) { 'packs/hive_dashboard/app/views/apiaries/show.html.erb' }
-
-    before do
-      write_file(template, <<~ERB)
+    let(:template_source) do
+      <<~ERB
         <section class="apiary">
           <h1><%= @apiary.name %></h1>
           <% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>
@@ -30,14 +29,53 @@ RSpec.describe QueryPackwerk::Violation do
       ERB
     end
 
+    before do
+      write_file(template, template_source)
+    end
+
     it 'counts each reference' do
       expect(violation.count).to eq(2)
     end
 
     it 'shows context from the template rather than the extracted Ruby' do
-      template_line = a_string_including('<% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>')
+      expect(violation.sources_with_contexts.values.flatten)
+        .to all(include('<% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>'))
+    end
 
-      expect(violation.sources_with_contexts.values.flatten).to match([template_line, template_line])
+    it 'shows the lines around each reference' do
+      expect(violation.sources_with_contexts(start_offset: 1, end_offset: 1).values.flatten).to eq(
+        [
+          <<~CONTEXT,
+            > #{template}:3 (L2..4)
+
+            <h1><%= @apiary.name %></h1>
+            <% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>
+              <p><%= HoneyProductionNectar.as_of_now.find_by(apiary_id: @apiary.id).volume %></p>
+          CONTEXT
+          <<~CONTEXT
+            > #{template}:4 (L3..5)
+
+            <% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>
+              <p><%= HoneyProductionNectar.as_of_now.find_by(apiary_id: @apiary.id).volume %></p>
+            <% end %>
+          CONTEXT
+        ]
+      )
+    end
+
+    context 'when a reference is near the top of the template' do
+      let(:template_source) do
+        <<~ERB
+          <p><%= HoneyProductionNectar.as_of_now.volume %></p>
+          <p>Updated daily</p>
+          <p>Volumes are in liters</p>
+          <footer>Hive Dashboard</footer>
+        ERB
+      end
+
+      it 'shows context from the top of the template' do
+        expect(violation.sources_with_contexts.values.flatten).to eq(["> #{template}:1 (L1..4)\n\n#{template_source}"])
+      end
     end
   end
 end
