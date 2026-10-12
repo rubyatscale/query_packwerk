@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    query_packwerk (0.1.25)
+    query_packwerk (0.1.26)
       coderay
       herb (>= 0.9)
       packwerk
