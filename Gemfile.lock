@@ -13,13 +13,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (8.1.3)
-      activesupport (= 8.1.3)
+    actionview (8.1.4)
+      activesupport (= 8.1.4)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activesupport (8.1.3)
+    activesupport (8.1.4)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.3.1)
@@ -33,25 +33,25 @@ GEM
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
     ast (2.4.3)
-    base64 (0.2.0)
+    base64 (0.3.0)
     benchmark (0.4.0)
-    better_html (2.1.1)
-      actionview (>= 6.0)
-      activesupport (>= 6.0)
+    better_html (2.2.0)
+      actionview (>= 7.0)
+      activesupport (>= 7.0)
       ast (~> 2.0)
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.1.9)
+    bigdecimal (4.1.3)
     builder (3.3.0)
     coderay (1.1.3)
-    concurrent-ruby (1.3.7)
-    connection_pool (2.5.0)
-    constant_resolver (0.2.0)
+    concurrent-ruby (1.3.8)
+    connection_pool (3.0.2)
+    constant_resolver (0.3.0)
     crass (1.0.7)
     date (3.4.1)
     diff-lcs (1.6.0)
-    drb (2.2.1)
+    drb (2.2.3)
     erubi (1.13.1)
     herb (0.11.0-aarch64-linux-gnu)
     herb (0.11.0-aarch64-linux-musl)
@@ -59,7 +59,7 @@ GEM
     herb (0.11.0-x86_64-darwin)
     herb (0.11.0-x86_64-linux-gnu)
     herb (0.11.0-x86_64-linux-musl)
-    i18n (1.14.7)
+    i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     io-console (0.8.0)
     irb (1.15.1)
@@ -69,7 +69,7 @@ GEM
     json (2.21.2)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
-    logger (1.6.6)
+    logger (1.7.0)
     loofah (2.25.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -92,22 +92,22 @@ GEM
       racc (~> 1.4)
     packs-specification (0.0.10)
       sorbet-runtime
-    packwerk (3.2.2)
+    packwerk (3.3.1)
       activesupport (>= 6.0)
       ast
+      benchmark
       better_html
       bundler
-      constant_resolver (>= 0.2.0)
+      constant_resolver (>= 0.3)
       parallel
       parser
-      prism (>= 0.25.0)
-      sorbet-runtime (>= 0.5.9914)
+      prism (>= 1.4.0)
       zeitwerk (>= 2.6.1)
-    parallel (2.1.0)
+    parallel (2.3.0)
     parse_packwerk (0.26.0)
       bigdecimal
       sorbet-runtime
-    parser (3.3.11.1)
+    parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
     pp (0.6.2)
@@ -121,7 +121,7 @@ GEM
       date
       stringio
     racc (1.8.1)
-    rails-dom-testing (2.2.0)
+    rails-dom-testing (2.3.0)
       activesupport (>= 5.0.0)
       minitest
       nokogiri (>= 1.6)
@@ -210,12 +210,12 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
-    uri (1.1.1)
+    uri (1.1.2)
     yard (0.9.44)
     yard-sorbet (0.9.0)
       sorbet-runtime
       yard
-    zeitwerk (2.7.2)
+    zeitwerk (2.8.3)
 
 PLATFORMS
   aarch64-linux
