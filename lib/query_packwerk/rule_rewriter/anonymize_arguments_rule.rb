@@ -7,7 +7,7 @@ module QueryPackwerk
       extend T::Sig
 
       # Arguments prefixed with a sigil like `*arg` and `&fn`
-      SIGIL_ARGS = T.let(%i[splat block_pass].freeze, T::Array[Symbol])
+      SIGIL_ARGS = %i[splat block_pass].freeze
 
       sig { override.params(node: RuboCop::AST::Node).void }
       def on_send(node)

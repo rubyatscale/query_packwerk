@@ -12,7 +12,7 @@ module QueryPackwerk
 
     Elem = type_member { { fixed: QueryPackwerk::Package } }
 
-    UNOWNED = T.let('Unowned', String)
+    UNOWNED = 'Unowned'
 
     include Enumerable
     include QueryInterface

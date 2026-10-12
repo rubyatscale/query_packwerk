@@ -4,7 +4,7 @@
 RSpec.describe QueryPackwerk::QueryInterface do
   let(:person) do
     Struct.new(:name, :age, :sex, :hobbies, keyword_init: true) do
-      def deconstruct_keys(keys)
+      define_method(:deconstruct_keys) do |keys|
         all_values = {
           name: name,
           age: age,

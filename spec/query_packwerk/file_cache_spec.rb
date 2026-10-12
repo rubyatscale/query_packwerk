@@ -4,7 +4,7 @@
 RSpec.describe QueryPackwerk::FileCache do
   subject(:file_cache) { described_class.new }
 
-  def sources_in(file_name, class_name: '::Billing::Invoice')
+  define_method(:sources_in) do |file_name, class_name: '::Billing::Invoice'|
     file_cache
       .get_full_sources(file_name: file_name, class_name: class_name)
       .map { |node| [node.loc.line, node.source] }

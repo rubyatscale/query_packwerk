@@ -9,7 +9,7 @@ module QueryPackwerk
   class Violation
     extend T::Sig
 
-    ALL_CAPS = T.let(/\A[A-Z_]+\z/, Regexp)
+    ALL_CAPS = /\A[A-Z_]+\z/
 
     sig { returns(QueryPackwerk::Package) }
     attr_reader :producing_pack
@@ -37,7 +37,7 @@ module QueryPackwerk
         QueryPackwerk::Package
       )
 
-      @file_cache = T.let(file_cache, QueryPackwerk::FileCache)
+      @file_cache = file_cache
       @cache_loaded = T.let(false, T::Boolean)
     end
 

@@ -19,3 +19,6 @@ gem 'rubocop-sorbet', '~> 0.16'
 
 gem 'sorbet'
 gem 'tapioca'
+
+# Unreleased fix for parsing `...` params (Shopify/rbi#625), needed by tapioca's RBS rewriter on herb 0.11
+gem 'rbi', github: 'Shopify/rbi'
