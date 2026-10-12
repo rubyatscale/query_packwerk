@@ -1,17 +1,5 @@
 version: 2
 updates:
-  # GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "github_actions"
-    cooldown:
-      default-days: 7
-
   # Ruby gems
   - package-ecosystem: "bundler"
     directory: "/"
@@ -21,5 +9,16 @@ updates:
     labels:
       - "dependencies"
       - "ruby"
+    cooldown:
+      default-days: 7
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github_actions"
     cooldown:
       default-days: 7
