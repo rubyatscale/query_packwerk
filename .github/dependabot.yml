@@ -11,3 +11,15 @@ updates:
       - "github_actions"
     cooldown:
       default-days: 7
+
+  # Ruby gems
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "ruby"
+    cooldown:
+      default-days: 7
