@@ -10,12 +10,12 @@ gem 'pry'
 
 gem 'packs-specification'
 
-gem 'rake', '~> 13.0'
-gem 'rspec', '~> 3.0'
+gem 'rake', '~> 13.4'
+gem 'rspec', '~> 3.13'
 
-gem 'rubocop', '~> 1.74'
-gem 'rubocop-performance', '~> 1.24'
-gem 'rubocop-sorbet', '~> 0.9'
+gem 'rubocop', '~> 1.91'
+gem 'rubocop-performance', '~> 1.27'
+gem 'rubocop-sorbet', '~> 0.16'
 
 gem 'sorbet'
 gem 'tapioca'
