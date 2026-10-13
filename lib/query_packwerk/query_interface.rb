@@ -99,7 +99,11 @@ module QueryPackwerk
         query_keys = query_params.keys
         all_values = all
 
-        accepted_keys = all_values.first.deconstruct_keys(nil).keys
+        # Keys are checked against the first value, and with none, nothing can match
+        first_value = all_values.first
+        return [] unless first_value
+
+        accepted_keys = first_value.deconstruct_keys(nil).keys
         invalid_keys = query_keys - accepted_keys
 
         raise ArgumentError, "The following keys are invalid for querying: #{invalid_keys.join(', ')}" if invalid_keys.any?

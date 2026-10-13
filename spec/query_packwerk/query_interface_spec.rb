@@ -105,6 +105,14 @@ RSpec.describe QueryPackwerk::QueryInterface do
     it 'can check for multiple potential Array matches' do
       expect(people.where(hobbies: %w[piano fencing]).count).to eq(2)
     end
+
+    context 'when there are no people' do
+      let(:all_people) { [] }
+
+      it 'finds nobody' do
+        expect(people.where(adult: true).count).to eq(0)
+      end
+    end
   end
 
   describe '#count' do
