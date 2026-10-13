@@ -16,6 +16,8 @@ module QueryPackwerk
   autoload :Console, 'query_packwerk/console'
   autoload :ConsoleHelpers, 'query_packwerk/console_helpers'
   autoload :QueryInterface, 'query_packwerk/query_interface'
+  autoload :ConstantUse, 'query_packwerk/constant_use'
+  autoload :ConstantUses, 'query_packwerk/constant_uses'
   autoload :Violations, 'query_packwerk/violations'
   autoload :Violation, 'query_packwerk/violation'
   autoload :Packages, 'query_packwerk/packages'

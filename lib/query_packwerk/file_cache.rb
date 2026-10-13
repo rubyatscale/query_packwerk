@@ -25,9 +25,6 @@ module QueryPackwerk
       # { [file_name, const_name] => [AST const nodes with full receiver chains] }
       @full_source_cache = T.let({}, T::Hash[T::Array[String], T::Array[RuboCop::AST::Node]])
 
-      # { [file_name, const_name] => [anonymized sources] }
-      @anonymized_source_cache = T.let({}, T::Hash[T::Array[String], T::Array[String]])
-
       @anonymized_args_cache = T.let({}, T::Hash[String, String])
 
       @is_active_record_cache = T.let({}, T::Hash[String, String])
@@ -120,23 +117,6 @@ module QueryPackwerk
       @anonymized_args_cache[source] ||= RuleRewriter
                                          .rewrite(source)
                                          .delete("\n").squeeze(' ').delete_prefix('::')
-    end
-
-    # Get the full receiver chains on a constant, and anonymize their arguments
-    sig { params(file_name: String, class_name: String).returns(T::Array[String]) }
-    def get_full_anonymous_sources(file_name:, class_name:)
-      const_key = [file_name, class_name]
-
-      return T.must(@anonymized_source_cache[const_key]) if @anonymized_source_cache.key?(const_key)
-
-      @anonymized_source_cache[const_key] = get_full_sources(
-        file_name: file_name,
-        class_name: class_name
-      ).map do |node|
-        get_full_receiver_chain(node)
-          .source
-          .then { |s| anonymize_arguments(s) }
-      end
     end
 
     private
