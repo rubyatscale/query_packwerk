@@ -144,3 +144,36 @@ RSpec.describe QueryPackwerk do
     end
   end
 end
+
+RSpec.describe QueryPackwerk do
+  include_context 'listed references'
+
+  describe '#references_for' do
+    it "gets all references from other packs to a pack's constants" do
+      references = described_class.references_for('honey_production')
+
+      expect(references).to be_a(QueryPackwerk::References)
+      expect(references.count).to eq(8)
+    end
+  end
+
+  describe '#references_from' do
+    it "gets all references from a pack to other packs' constants" do
+      expect(described_class.references_from('hive_dashboard').map(&:constant_name).tally).to eq(
+        '::HoneyProductionNectar' => 3,
+        '::Beekeeping::NectarSource' => 1,
+        '::Beekeeping::Nectars' => 1
+      )
+    end
+  end
+
+  describe '#reload!' do
+    it 'runs pks again for the next query' do
+      described_class.references_for('honey_production')
+      described_class.reload!
+      described_class.references_for('honey_production')
+
+      expect(QueryPackwerk::Pks).to have_received(:list_references).twice
+    end
+  end
+end

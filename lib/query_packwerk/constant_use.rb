@@ -2,10 +2,10 @@
 # frozen_string_literal: true
 
 module QueryPackwerk
-  # A pack's use of a constant that another pack defines, such as a Violation.
-  # Shows the code that uses the constant: its sources, each the constant with
-  # any calls chained on it. Subclasses say which files the code is in and how
-  # to find the sources in each.
+  # A pack's use of a constant that another pack defines, such as a Violation
+  # or a Reference. Shows the code that uses the constant: its sources, each the
+  # constant with any calls chained on it. Subclasses say which files the code
+  # is in and how to find the sources in each.
   class ConstantUse
     extend T::Sig
     extend T::Helpers

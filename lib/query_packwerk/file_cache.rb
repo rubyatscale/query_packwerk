@@ -25,6 +25,9 @@ module QueryPackwerk
       # { [file_name, const_name] => [AST const nodes with full receiver chains] }
       @full_source_cache = T.let({}, T::Hash[T::Array[String], T::Array[RuboCop::AST::Node]])
 
+      # { file_name => { line => [AST const and send nodes that start on it] } }
+      @line_cache = T.let({}, T::Hash[String, T::Hash[Integer, T::Array[RuboCop::AST::Node]]])
+
       @anonymized_args_cache = T.let({}, T::Hash[String, String])
 
       @is_active_record_cache = T.let({}, T::Hash[String, String])
@@ -111,6 +114,24 @@ module QueryPackwerk
       end
     end
 
+    # Gets the full source of the reference that pks finds at a line and column.
+    # pks counts the column in bytes, where the parser counts characters. A
+    # reference that pks infers from an association, as `has_many :tacos` gives
+    # `::Taco`, is at the call, so the call is its source.
+    sig do
+      params(file_name: String, line: Integer, column: Integer).returns(T.nilable(RuboCop::AST::Node))
+    end
+    def get_full_source_at(file_name:, line:, column:)
+      nodes = nodes_by_line(file_name).fetch(line, []).select do |node|
+        range = node.source_range
+        range.source_line[0, range.column].bytesize == column
+      end
+
+      # The outermost constant, as `Foo::Bar` rather than the `Foo` in it
+      node = nodes.find(&:const_type?) || nodes.find(&:send_type?)
+      node && get_full_receiver_chain(node)
+    end
+
     # Cleans up and anonymizes a source
     sig { params(source: String).returns(String) }
     def anonymize_arguments(source)
@@ -120,6 +141,12 @@ module QueryPackwerk
     end
 
     private
+
+    # Constants and calls by the line they start on, outermost first, as `each_node` visits them
+    sig { params(file_name: String).returns(T::Hash[Integer, T::Array[RuboCop::AST::Node]]) }
+    def nodes_by_line(file_name)
+      @line_cache[file_name] ||= get_file_ast(file_name).each_node(:const, :send).group_by { |node| node.loc.line }
+    end
 
     # Blanks out everything in an ERB template except its Ruby code, so line numbers still match the template
     sig { params(file_name: String).returns(String) }

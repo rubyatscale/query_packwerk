@@ -9,7 +9,8 @@ require 'rubocop'
 # QueryPackwerk is a tool for querying Packwerk violations.
 #
 # It is built on top of ParsePackwerk, and provides a Ruby-friendly API
-# for querying package.yml and package_todo.yml files.
+# for querying package.yml and package_todo.yml files. It also queries every
+# reference between packages, allowed or not, which pks lists.
 #
 # See also: https://github.com/rubyatscale/parse_packwerk
 module QueryPackwerk
@@ -20,6 +21,9 @@ module QueryPackwerk
   autoload :ConstantUses, 'query_packwerk/constant_uses'
   autoload :Violations, 'query_packwerk/violations'
   autoload :Violation, 'query_packwerk/violation'
+  autoload :References, 'query_packwerk/references'
+  autoload :Reference, 'query_packwerk/reference'
+  autoload :Pks, 'query_packwerk/pks'
   autoload :Packages, 'query_packwerk/packages'
   autoload :Package, 'query_packwerk/package'
   autoload :RuleRewriter, 'query_packwerk/rule_rewriter'
@@ -79,6 +83,21 @@ module QueryPackwerk
     violations_for(pack_name).consumers(threshold: threshold)
   end
 
+  # Get all references from other packages to this package's constants, whether
+  # or not they break the packages' rules (i.e., how others use this package).
+  # These come from pks, which must be installed.
+  sig { params(pack_name: String).returns(QueryPackwerk::References) }
+  def references_for(pack_name)
+    QueryPackwerk::References.where(producing_pack: full_name(pack_name))
+  end
+
+  # Get all references from this package to other packages' constants, whether
+  # or not they break the packages' rules (i.e., how this package uses others)
+  sig { params(pack_name: String).returns(QueryPackwerk::References) }
+  def references_from(pack_name)
+    QueryPackwerk::References.where(consuming_pack: full_name(pack_name))
+  end
+
   # In case anyone is still using shorthand for pack names
   sig { params(pack_name: String).returns(String) }
   def full_name(pack_name)
@@ -91,5 +110,6 @@ module QueryPackwerk
   def reload!
     Packages.reload!
     Violations.reload!
+    References.reload!
   end
 end

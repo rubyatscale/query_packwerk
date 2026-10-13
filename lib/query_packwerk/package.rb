@@ -81,6 +81,20 @@ module QueryPackwerk
     end
     alias incoming_violations violations
 
+    # Returns references from other packages to this package's constants,
+    # whether or not they break the packages' rules. These come from pks.
+    sig { returns(QueryPackwerk::References) }
+    def incoming_references
+      QueryPackwerk::References.where(producing_pack: name)
+    end
+
+    # Returns references from this package to other packages' constants,
+    # whether or not they break the packages' rules. These come from pks.
+    sig { returns(QueryPackwerk::References) }
+    def outgoing_references
+      QueryPackwerk::References.where(consuming_pack: name)
+    end
+
     # Returns all packages that consume (depend on) this package
     sig { returns(QueryPackwerk::Packages) }
     def consumers

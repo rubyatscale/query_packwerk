@@ -129,3 +129,30 @@ RSpec.describe QueryPackwerk::Package do
     end
   end
 end
+
+RSpec.describe QueryPackwerk::Package do
+  include_context 'listed references'
+
+  describe '#incoming_references' do
+    it "returns references from other packages to this package's constants" do
+      references = QueryPackwerk.package('packs/honey_production').incoming_references
+
+      expect(references).to be_a(QueryPackwerk::References)
+      expect(references.count).to eq(8)
+    end
+  end
+
+  describe '#outgoing_references' do
+    it "returns references from this package to other packages' constants" do
+      references = QueryPackwerk.package('packs/apiary_reports').outgoing_references
+
+      expect(references).to be_a(QueryPackwerk::References)
+      expect(references.map(&:location)).to eq(
+        [
+          'packs/apiary_reports/app/services/apiary_report.rb:2',
+          'packs/apiary_reports/app/services/apiary_report.rb:4'
+        ]
+      )
+    end
+  end
+end

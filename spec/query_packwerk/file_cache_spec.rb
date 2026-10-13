@@ -102,4 +102,38 @@ RSpec.describe QueryPackwerk::FileCache do
       expect(sources_in('Gemfile.lock')).to eq([])
     end
   end
+
+  describe '#get_full_source_at' do
+    define_method(:source_at) do |line, column|
+      file_cache.get_full_source_at(file_name: 'app/models/account.rb', line: line, column: column)&.source
+    end
+
+    before do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          has_many :invoices, dependent: :destroy
+
+          def overdue_lines = Billing::Invoice::Line.overdue_for(self)
+
+          def summary = "Échéance ⏰ \#{Billing::Invoice.due_for(self).count}"
+        end
+      RUBY
+    end
+
+    it 'finds the outermost constant that starts there, with the calls chained on it' do
+      expect(source_at(4, 22)).to eq('Billing::Invoice::Line.overdue_for(self)')
+    end
+
+    it 'counts the column in bytes, as pks does' do
+      expect(source_at(6, 34)).to eq('Billing::Invoice.due_for(self).count')
+    end
+
+    it 'finds the call when no constant starts there, as for an association' do
+      expect(source_at(2, 2)).to eq('has_many :invoices, dependent: :destroy')
+    end
+
+    it 'finds nothing when nothing starts there' do
+      expect(source_at(4, 23)).to be_nil
+    end
+  end
 end

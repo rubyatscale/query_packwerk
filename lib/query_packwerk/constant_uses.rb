@@ -4,9 +4,9 @@
 require 'coderay'
 
 module QueryPackwerk
-  # A collection of ConstantUses, such as Violations, with methods that group
-  # their sources by the constant they use, and that say which packs use and
-  # define those constants.
+  # A collection of ConstantUses, such as Violations or References, with
+  # methods that group their sources by the constant they use, and that say
+  # which packs use and define those constants.
   class ConstantUses
     extend T::Sig
     extend T::Generic
@@ -63,7 +63,7 @@ module QueryPackwerk
         warn
       end
 
-      warn "Prepopulating sources cache with #{count} violations: "
+      warn "Prepopulating sources cache with #{count} #{self.class.name.to_s.split('::').last.to_s.downcase}: "
       start_time = Time.now
 
       total_sources_loaded = @original_collection.sum do |use|
@@ -92,7 +92,7 @@ module QueryPackwerk
       !empty?
     end
 
-    # Gets all sources and their receiving chains grouped by the constant they've violated.
+    # Gets all sources and their receiving chains grouped by the constant they use.
     sig { returns(T.untyped) }
     def raw_sources
       load_sources!
@@ -102,7 +102,7 @@ module QueryPackwerk
       end
     end
 
-    # Gets all sources and their receiving chains grouped by the constant they've violated.
+    # Gets all sources and their receiving chains grouped by the constant they use.
     sig { returns(T::Hash[String, T::Array[String]]) }
     def sources
       load_sources!
@@ -182,7 +182,7 @@ module QueryPackwerk
     end
 
     # Like the above source counts, but uses anonymized sources to give a clearer look at how often each
-    # "shape" of a method is called across a set of violations.
+    # "shape" of a method is called across a set of violations or references.
     sig { params(threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
     def anonymous_source_counts(threshold: 0)
       load_sources!
@@ -190,21 +190,21 @@ module QueryPackwerk
       deep_merge_counts(@original_collection, threshold:) { |v| [v.class_name, v.anonymous_source_counts] }
     end
 
-    # Find which packs consume these violations
+    # Find which packs consume the constants these use
     sig { params(threshold: Integer).returns(T::Hash[String, Integer]) }
     def consumers(threshold: 0)
       tallies = @original_collection.map { |v| v.consuming_pack.name }.tally
       threshold_filter_sort(tallies, threshold:)
     end
 
-    # Find which packs produce these violations
+    # Find which packs produce the constants these use
     sig { params(threshold: Integer).returns(T::Hash[String, Integer]) }
     def producers(threshold: 0)
       tallies = @original_collection.map { |v| v.producing_pack.name }.tally
       threshold_filter_sort(tallies, threshold:)
     end
 
-    # Filter for violations which include one of the provided file globs
+    # Filter for those in files that match one of the provided file globs
     sig { params(file_globs: T.any(String, Regexp)).returns(T.self_type) }
     def including_files(*file_globs)
       filtered = @original_collection.select do |use|
@@ -214,7 +214,7 @@ module QueryPackwerk
       T.unsafe(self.class).new(filtered)
     end
 
-    # Filter for violations which do not include one of the provided file globs
+    # Filter for those not in files that match one of the provided file globs
     sig { params(file_globs: T.any(String, Regexp)).returns(T.self_type) }
     def excluding_files(*file_globs)
       filtered = @original_collection.reject do |use|
