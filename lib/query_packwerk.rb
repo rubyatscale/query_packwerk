@@ -108,6 +108,8 @@ module QueryPackwerk
 
   sig { void }
   def reload!
+    # ParsePackwerk keeps the packs it reads, along with their package_todo.yml files
+    ParsePackwerk.bust_cache!
     Packages.reload!
     Violations.reload!
     References.reload!

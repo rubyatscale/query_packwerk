@@ -5,14 +5,12 @@
 # lists: allowed or not, recorded in a package_todo.yml or not, by a relative
 # name, through an association, in ERB, and after multibyte characters.
 RSpec.shared_context 'referenced packs' do
-  # ParsePackwerk and QueryPackwerk keep the packs they find, so they'd keep
-  # these from, or for, specs that write other packs
+  # QueryPackwerk keeps the packs it finds, so it'd keep these from, or for,
+  # specs that write other packs
   around do |example|
-    ParsePackwerk.bust_cache!
     QueryPackwerk.reload!
     example.run
   ensure
-    ParsePackwerk.bust_cache!
     QueryPackwerk.reload!
   end
 

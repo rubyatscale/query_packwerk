@@ -98,6 +98,14 @@ RSpec.describe QueryPackwerk::Pks do
       )
     end
 
+    it 'checks the version each time it runs pks, as bin/pks can change with the branch' do
+      write_pks('bin/pks')
+      described_class.list_references
+      write_pks('bin/pks', version: '0.6.0')
+
+      expect { described_class.list_references }.to raise_error(QueryPackwerk::Pks::Error, /is pks 0\.6\.0\./)
+    end
+
     it 'says what went wrong when pks fails' do
       write_pks('bin/pks', warning: "Error: No pack found 'packs/foo'", exit_status: 2)
 

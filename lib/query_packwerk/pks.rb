@@ -17,8 +17,6 @@ module QueryPackwerk
     MINIMUM_VERSION = Gem::Version.new('0.7.0')
     INSTALLATION_URL = 'https://github.com/rubyatscale/pks/blob/main/INSTALLATION.md'
 
-    @checked_executables = T.let([], T::Array[String])
-
     class << self
       extend T::Sig
 
@@ -53,10 +51,9 @@ module QueryPackwerk
 
       private
 
+      # Checked each time pks runs, since checking out another branch can change bin/pks
       sig { params(executable: String).void }
       def check_version(executable)
-        return if @checked_executables.include?(executable)
-
         output, status = Open3.capture2e(executable, '--version')
         version = output[/\Apks (\S+)/, 1]
         raise Error, "Could not get the version of #{executable}:\n#{output}" unless status.success? && version && Gem::Version.correct?(version)
@@ -65,8 +62,6 @@ module QueryPackwerk
           raise Error, "query_packwerk finds references with `pks list-references`, which needs pks #{MINIMUM_VERSION} " \
                        "or later, but #{executable} is pks #{version}. To upgrade it, see #{INSTALLATION_URL}"
         end
-
-        @checked_executables << executable
       end
     end
   end

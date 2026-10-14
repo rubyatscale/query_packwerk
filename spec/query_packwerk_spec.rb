@@ -175,5 +175,37 @@ RSpec.describe QueryPackwerk do
 
       expect(QueryPackwerk::Pks).to have_received(:list_references).twice
     end
+
+    it 'reads the package_todo.yml files again' do
+      expect(described_class.todos_for('apiary_reports').count).to eq(1)
+
+      write_package_todo(pack_name: 'packs/apiary_reports', references: {})
+      described_class.reload!
+
+      expect(described_class.todos_for('apiary_reports').count).to eq(0)
+    end
+
+    it 'finds a pack added since, which pks lists references from' do
+      described_class.references_for('honey_production')
+
+      write_package_yml('packs/wax_reports')
+      write_file('packs/wax_reports/app/services/wax_report.rb', <<~RUBY)
+        class WaxReport
+          def nectar_count = HoneyProductionNectar.count
+        end
+      RUBY
+      listed_references << {
+        'file' => 'packs/wax_reports/app/services/wax_report.rb', 'line' => 2, 'column' => 21,
+        'constant_name' => '::HoneyProductionNectar',
+        'referencing_pack_name' => 'packs/wax_reports', 'defining_pack_name' => 'packs/honey_production',
+        'violations' => [
+          { 'violation_type' => 'dependency', 'strict' => false, 'recorded' => false },
+          { 'violation_type' => 'privacy', 'strict' => false, 'recorded' => false }
+        ]
+      }
+      described_class.reload!
+
+      expect(described_class.references_for('honey_production').consumers).to include('packs/wax_reports' => 1)
+    end
   end
 end
