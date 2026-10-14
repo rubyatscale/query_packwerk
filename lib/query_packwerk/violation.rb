@@ -66,37 +66,36 @@ module QueryPackwerk
       @file_cache.get_full_sources(file_name: file_name, class_name: class_name)
     end
 
-    sig do
-      params(keys: T.nilable(T::Array[Symbol])).returns(T::Hash[Symbol, T.untyped])
-    end
-    def deconstruct_keys(keys)
-      all_values = {
-        constant_name: class_name,
-        pack_name: to_package_name,
+    QUERY_KEYS = T.let(
+      {
+        constant_name: lambda(&:class_name),
+        pack_name: lambda(&:to_package_name),
 
         # Type related properties, including convenience boolean handlers
-        type: type,
-        privacy: type == 'privacy',
-        dependency: type == 'dependency',
+        type: lambda(&:type),
+        privacy: ->(violation) { violation.type == 'privacy' },
+        dependency: ->(violation) { violation.type == 'dependency' },
 
         # Reaching into which pack produced the violated constant, and
         # which consumes the violated constant.
-        consuming_pack: consuming_pack.name,
-        producing_pack: producing_pack.name,
+        consuming_pack: ->(violation) { violation.consuming_pack.name },
+        producing_pack: ->(violation) { violation.producing_pack.name },
 
         # Same, except for owners
-        producing_owner: producing_pack.owner,
-        consuming_owner: consuming_pack.owner,
+        producing_owner: ->(violation) { violation.producing_pack.owner },
+        consuming_owner: ->(violation) { violation.consuming_pack.owner },
 
         # So why is this "owner" implying producer? Because the
         # owner field of the violation is producer-oriented.
-        owner: producing_pack.owner,
-        owned: producing_pack.owner.nil?,
+        owner: ->(violation) { violation.producing_pack.owner },
+        owned: ->(violation) { violation.producing_pack.owner.nil? }
+      }.freeze,
+      T::Hash[Symbol, T.proc.params(arg0: QueryPackwerk::Violation).returns(T.untyped)]
+    )
 
-        **runtime_keys(keys)
-      }
-
-      keys.nil? ? all_values : all_values.slice(*T.unsafe(keys))
+    sig { override.returns(T::Hash[Symbol, T.proc.params(arg0: QueryPackwerk::Violation).returns(T.untyped)]) }
+    def query_keys
+      QUERY_KEYS
     end
 
     sig { returns(String) }

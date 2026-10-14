@@ -115,6 +115,14 @@ RSpec.describe QueryPackwerk::Reference do
         ].map { |location| reference_at(location).deconstruct_keys([:is_active_record]).fetch(:is_active_record) }
       ).to eq([true, false, false])
     end
+
+    it 'looks its constant up only for a query that asks about it' do
+      allow(Kernel).to receive(:const_defined?).and_call_original
+
+      expect(QueryPackwerk::References.where(allowed: true).count).to eq(2)
+      # Once, as where checks the query's keys against the first reference's
+      expect(Kernel).to have_received(:const_defined?).once
+    end
   end
 
   it 'is allowed when it breaks no rule' do

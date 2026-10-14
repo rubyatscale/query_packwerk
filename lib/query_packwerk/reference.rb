@@ -116,36 +116,35 @@ module QueryPackwerk
       [@file_cache.get_full_source_at(file_name: file_name, line: line, column: column)].compact
     end
 
-    sig do
-      params(keys: T.nilable(T::Array[Symbol])).returns(T::Hash[Symbol, T.untyped])
-    end
-    def deconstruct_keys(keys)
-      all_values = {
-        constant_name: class_name,
-        pack_name: producing_pack.name,
-        file: file,
+    QUERY_KEYS = T.let(
+      {
+        constant_name: lambda(&:class_name),
+        pack_name: ->(reference) { reference.producing_pack.name },
+        file: lambda(&:file),
 
         # Which of the packs' rules the reference breaks, if any
-        allowed: allowed?,
-        violation_types: violation_types,
-        privacy: violation_types.include?('privacy'),
-        dependency: violation_types.include?('dependency'),
+        allowed: lambda(&:allowed?),
+        violation_types: lambda(&:violation_types),
+        privacy: ->(reference) { reference.violation_types.include?('privacy') },
+        dependency: ->(reference) { reference.violation_types.include?('dependency') },
 
         # Which pack defines the constant, and which pack's code uses it
-        consuming_pack: consuming_pack.name,
-        producing_pack: producing_pack.name,
+        consuming_pack: ->(reference) { reference.consuming_pack.name },
+        producing_pack: ->(reference) { reference.producing_pack.name },
 
-        producing_owner: producing_pack.owner,
-        consuming_owner: consuming_pack.owner,
+        producing_owner: ->(reference) { reference.producing_pack.owner },
+        consuming_owner: ->(reference) { reference.consuming_pack.owner },
 
         # As for violations, "owner" is the producing pack's
-        owner: producing_pack.owner,
-        owned: producing_pack.owner != Packages::UNOWNED,
+        owner: ->(reference) { reference.producing_pack.owner },
+        owned: ->(reference) { reference.producing_pack.owner != Packages::UNOWNED }
+      }.freeze,
+      T::Hash[Symbol, T.proc.params(arg0: QueryPackwerk::Reference).returns(T.untyped)]
+    )
 
-        **runtime_keys(keys)
-      }
-
-      keys.nil? ? all_values : all_values.slice(*T.unsafe(keys))
+    sig { override.returns(T::Hash[Symbol, T.proc.params(arg0: QueryPackwerk::Reference).returns(T.untyped)]) }
+    def query_keys
+      QUERY_KEYS
     end
 
     sig { returns(String) }

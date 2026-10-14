@@ -13,6 +13,7 @@ module QueryPackwerk
     abstract!
 
     ALL_CAPS = /\A[A-Z_]+\z/
+    RUNTIME_KEYS = %i[is_active_record is_constant].freeze
 
     sig { abstract.returns(String) }
     def class_name; end
@@ -29,6 +30,10 @@ module QueryPackwerk
     # The sources in one of the files, with the calls chained on each
     sig { abstract.params(file_name: String).returns(T::Array[RuboCop::AST::Node]) }
     def full_sources_in(file_name); end
+
+    # The keys that where and pattern matching can ask for, with how to read each
+    sig { abstract.returns(T::Hash[Symbol, T.proc.params(arg0: T.untyped).returns(T.untyped)]) }
+    def query_keys; end
 
     sig { params(file_cache: QueryPackwerk::FileCache).void }
     def initialize(file_cache:)
@@ -171,11 +176,28 @@ module QueryPackwerk
       end
     end
 
+    # Reads only the keys asked for, since where asks every use in a collection
+    sig do
+      params(keys: T.nilable(T::Array[Symbol])).returns(T::Hash[Symbol, T.untyped])
+    end
+    def deconstruct_keys(keys)
+      readers = query_keys
+      values = (keys || readers.keys).each_with_object({}) do |key, key_values|
+        reader = readers[key]
+        key_values[key] = reader.call(self) if reader
+      end
+
+      runtime_values = runtime_keys(keys)
+      values.merge(keys.nil? ? runtime_values : runtime_values.slice(*T.unsafe(keys)))
+    end
+
     sig do
       params(keys: T.nilable(T::Array[Symbol])).returns(T::Hash[Symbol, T.untyped])
     end
     def runtime_keys(keys)
       return {} unless defined?(Rails)
+      # These load the constant, so only when asked for
+      return {} unless keys.nil? || keys.intersect?(RUNTIME_KEYS)
 
       runtime_values = {}
 
