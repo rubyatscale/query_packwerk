@@ -17,6 +17,12 @@ RSpec.describe QueryPackwerk::Violations do
       expect(violations).to eq(['::Beekeeping::HoneyProduction::Nectars'])
     end
 
+    it 'finds a constant named without its leading ::' do
+      violations = described_class.where(constant_name: 'Beekeeping::HoneyProduction::Nectars').map(&:class_name)
+
+      expect(violations).to eq(['::Beekeeping::HoneyProduction::Nectars'])
+    end
+
     it 'keeps the files that all parses, so each query parses a file only once' do
       expect(described_class.where(privacy: true).file_cache).to equal(described_class.all.file_cache)
     end

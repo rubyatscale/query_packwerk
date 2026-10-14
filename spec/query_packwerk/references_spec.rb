@@ -95,6 +95,16 @@ RSpec.describe QueryPackwerk::References do
       expect(described_class.where(owned: false).map(&:constant_name)).to eq(['::ApiaryReportCard'])
     end
 
+    it 'finds the references to constants named with or without their leading ::' do
+      expect(described_class.where(constant_name: %w[Beekeeping::Nectars ::ApiaryReportCard]).map(&:location)).to eq(
+        [
+          'app/services/apiary_summary.rb:2',
+          'packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:12',
+          'packs/hive_dashboard/app/services/report_link.rb:2'
+        ]
+      )
+    end
+
     it 'finds the references from a pack' do
       expect(described_class.where(consuming_pack: '.').map(&:constant_name)).to eq(['::Beekeeping::Nectars'])
     end

@@ -19,6 +19,35 @@ module QueryPackwerk
     include Enumerable
     include QueryInterface
 
+    class << self
+      extend T::Sig
+
+      # package_todo.yml and pks name a constant from the top, as ::Foo::Bar, so
+      # `constant_name: 'Foo::Bar'` would find nothing unless it's qualified too
+      sig do
+        params(
+          query_params: T.untyped,
+          query_fn: T.nilable(T.proc.params(arg0: T.untyped).returns(T::Boolean))
+        ).returns(T.untyped)
+      end
+      def where(**query_params, &query_fn)
+        query_params[:constant_name] = qualify(query_params[:constant_name]) if query_params.key?(:constant_name)
+
+        super
+      end
+
+      private
+
+      sig { params(name: T.untyped).returns(T.untyped) }
+      def qualify(name)
+        case name
+        when String then name.start_with?('::') ? name : "::#{name}"
+        when Array then name.map { |each_name| qualify(each_name) }
+        else name
+        end
+      end
+    end
+
     sig { override.returns(T::Array[Elem]) }
     attr_reader :original_collection
 
