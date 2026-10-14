@@ -36,7 +36,7 @@ module QueryPackwerk
 
   sig { params(name: String).returns(T.nilable(QueryPackwerk::Package)) }
   def package(name)
-    Packages.where(name: name).first
+    Packages.where(name: full_name(name)).first
   end
 
   # Get all violations where other packages access code from this package

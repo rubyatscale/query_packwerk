@@ -9,6 +9,10 @@ RSpec.describe QueryPackwerk do
       expect(described_class.package(package_name)).to be_a(QueryPackwerk::Package)
     end
 
+    it 'gets a package by its name in packs/, as violations_for does' do
+      expect(described_class.package('honey_production')&.name).to eq('packs/honey_production')
+    end
+
     it 'returns nil if the package does not exist' do
       expect(described_class.package('not_here')).to be_nil
     end
