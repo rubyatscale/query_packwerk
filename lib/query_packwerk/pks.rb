@@ -30,12 +30,17 @@ module QueryPackwerk
 
         # Warnings, as about a file that pks can't parse
         $stderr.print(stderr)
-        JSON.parse(stdout).fetch('references')
+        # pks prints UTF-8, whatever the locale. Freezing shares the strings of each file and constant.
+        JSON.parse(stdout.force_encoding(Encoding::UTF_8), freeze: true).fetch('references')
       end
 
       # bin/pks, as in an app that pins a version of pks, or else pks on the PATH
       sig { returns(String) }
       def executable
+        # A DotSlash file saved from a release isn't executable at first. Running
+        # pks on the PATH instead would ignore the version the app pins.
+        raise Error, "bin/pks isn't executable. To run it, `chmod +x bin/pks`" if File.file?('bin/pks') && !File.executable?('bin/pks')
+
         candidates = ['bin', *ENV.fetch('PATH', '').split(File::PATH_SEPARATOR)].map do |directory|
           File.expand_path('pks', directory)
         end
@@ -54,9 +59,10 @@ module QueryPackwerk
       # Checked each time pks runs, since checking out another branch can change bin/pks
       sig { params(executable: String).void }
       def check_version(executable)
-        output, status = Open3.capture2e(executable, '--version')
-        version = output[/\Apks (\S+)/, 1]
-        raise Error, "Could not get the version of #{executable}:\n#{output}" unless status.success? && version && Gem::Version.correct?(version)
+        # Only stdout, as a wrapper may warn on stderr first
+        stdout, stderr, status = Open3.capture3(executable, '--version')
+        version = stdout[/^pks (\S+)$/, 1]
+        raise Error, "Could not get the version of #{executable}:\n#{stdout}#{stderr}" unless status.success? && version && Gem::Version.correct?(version)
 
         if Gem::Version.new(version) < MINIMUM_VERSION
           raise Error, "query_packwerk finds references with `pks list-references`, which needs pks #{MINIMUM_VERSION} " \

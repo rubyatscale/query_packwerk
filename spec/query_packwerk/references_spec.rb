@@ -34,13 +34,24 @@ RSpec.describe QueryPackwerk::References do
       expect(QueryPackwerk::Pks).to have_received(:list_references).twice
     end
 
-    it 'says when pks lists a pack that ParsePackwerk does not find' do
+    it 'says when pks lists a pack that has no package.yml' do
       listed_references.first['referencing_pack_name'] = 'packs/gone'
 
       expect { described_class.all }.to raise_error(
         QueryPackwerk::Pks::Error,
-        'pks lists references from or to packs/gone, which has no package.yml that ParsePackwerk finds'
+        'pks lists references from or to packs/gone, which has no package.yml'
       )
+    end
+
+    it 'finds a pack that a symlink points to, which ParsePackwerk does not' do
+      Dir.mktmpdir do |shared_pack|
+        File.write(File.join(shared_pack, 'package.yml'), "enforce_dependencies: true\n")
+        File.symlink(shared_pack, 'packs/wax_reports')
+        listed_references.first['referencing_pack_name'] = 'packs/wax_reports'
+
+        expect(ParsePackwerk.find('packs/wax_reports')).to be_nil
+        expect(described_class.all.first.consuming_pack.name).to eq('packs/wax_reports')
+      end
     end
   end
 

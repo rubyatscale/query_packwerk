@@ -68,8 +68,10 @@ module QueryPackwerk
 
       sig { params(name: String).returns(QueryPackwerk::Package) }
       def package(name)
-        original_package = ParsePackwerk.find(name)
-        raise Pks::Error, "pks lists references from or to #{name}, which has no package.yml that ParsePackwerk finds" unless original_package
+        yml = Pathname.new(name).join(ParsePackwerk::PACKAGE_YML_NAME)
+        # pks follows a symlink to a pack, where ParsePackwerk's default `**/` glob doesn't
+        original_package = ParsePackwerk.find(name) || (ParsePackwerk::Package.from(yml) if yml.file?)
+        raise Pks::Error, "pks lists references from or to #{name}, which has no package.yml" unless original_package
 
         QueryPackwerk::Package.new(original_package: original_package)
       end

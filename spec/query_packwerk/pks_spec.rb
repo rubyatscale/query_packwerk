@@ -5,14 +5,14 @@ require 'shellwords'
 
 RSpec.describe QueryPackwerk::Pks do
   # A stand-in for pks that reports a version and prints references
-  define_method(:write_pks) do |path, version: '0.7.0', references: [], warning: '', exit_status: 0|
+  define_method(:write_pks) do |path, version: '0.7.0', version_output: "pks #{version}", references: [], warning: '', exit_status: 0|
     write_file(path, <<~SH)
       #!/bin/sh
+      printf '%s' #{Shellwords.escape(warning)} >&2
       if [ "$1" = --version ]; then
-        echo 'pks #{version}'
+        printf '%s\\n' #{Shellwords.escape(version_output)}
       else
-        printf '%s' #{Shellwords.escape(warning)} >&2
-        echo #{Shellwords.escape(JSON.generate('references' => references))}
+        printf '%s\\n' #{Shellwords.escape(JSON.generate('references' => references))}
         exit #{exit_status}
       fi
     SH
@@ -71,10 +71,38 @@ RSpec.describe QueryPackwerk::Pks do
       end
     end
 
+    it 'says to make bin/pks executable, rather than run pks on the PATH' do
+      write_file('bin/pks', "#!/bin/sh\n")
+      write_pks('path/pks', references: [reference])
+
+      with_path('path') do
+        expect { described_class.list_references }.to raise_error(
+          QueryPackwerk::Pks::Error, "bin/pks isn't executable. To run it, `chmod +x bin/pks`"
+        )
+      end
+    end
+
     it 'passes on what pks warns about' do
       write_pks('bin/pks', warning: "Couldn't parse packs/foo/app/models/foo.rb\n")
 
       expect { described_class.list_references }.to output("Couldn't parse packs/foo/app/models/foo.rb\n").to_stderr
+    end
+
+    it 'gets the version from what pks prints, rather than from what it warns about' do
+      write_pks('bin/pks', references: [reference], warning: "warning: running pks from ~/.cargo/bin\n")
+
+      expect { expect(described_class.list_references).to eq([reference]) }.to output.to_stderr
+    end
+
+    it 'reads what pks prints as UTF-8, whatever the locale' do
+      reference['file'] = 'packs/foo/app/services/récolte.rb'
+      write_pks('bin/pks', references: [reference])
+      original = Encoding.default_external
+      Encoding.default_external = Encoding::US_ASCII
+
+      expect(described_class.list_references).to eq([reference])
+    ensure
+      Encoding.default_external = original
     end
 
     it 'says how to install pks when there is none' do
@@ -95,6 +123,15 @@ RSpec.describe QueryPackwerk::Pks do
         'query_packwerk finds references with `pks list-references`, which needs pks 0.7.0 or later, ' \
         "but #{File.expand_path('bin/pks')} is pks 0.6.0. " \
         'To upgrade it, see https://github.com/rubyatscale/pks/blob/main/INSTALLATION.md'
+      )
+    end
+
+    it 'says when it cannot get the version of pks' do
+      write_pks('bin/pks', version_output: "error: unexpected argument '--version'")
+
+      expect { described_class.list_references }.to raise_error(
+        QueryPackwerk::Pks::Error,
+        "Could not get the version of #{File.expand_path('bin/pks')}:\nerror: unexpected argument '--version'\n"
       )
     end
 
