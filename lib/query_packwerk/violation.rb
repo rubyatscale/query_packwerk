@@ -88,7 +88,7 @@ module QueryPackwerk
         # So why is this "owner" implying producer? Because the
         # owner field of the violation is producer-oriented.
         owner: ->(violation) { violation.producing_pack.owner },
-        owned: ->(violation) { violation.producing_pack.owner.nil? }
+        owned: ->(violation) { violation.producing_pack.owner != Packages::UNOWNED }
       }.freeze,
       T::Hash[Symbol, T.proc.params(arg0: QueryPackwerk::Violation).returns(T.untyped)]
     )

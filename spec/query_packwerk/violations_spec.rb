@@ -101,3 +101,16 @@ RSpec.describe QueryPackwerk::Violations do
     end
   end
 end
+
+RSpec.describe QueryPackwerk::Violations do
+  include_context 'referenced packs'
+
+  describe '.where' do
+    it 'finds the violations of a pack with an owner' do
+      expect(described_class.where(owned: true).map { |violation| violation.consuming_pack.name }).to contain_exactly(
+        'packs/hive_dashboard', 'packs/apiary_reports'
+      )
+      expect(described_class.where(owned: false)).to be_empty
+    end
+  end
+end
