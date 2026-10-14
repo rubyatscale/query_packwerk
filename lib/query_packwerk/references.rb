@@ -24,6 +24,7 @@ module QueryPackwerk
 
         file_cache = QueryPackwerk::FileCache.new
         packages = T.let({}, T::Hash[String, QueryPackwerk::Package])
+        pack = ->(name) { packages[name] ||= package(name) }
 
         references = Pks.list_references.map do |reference|
           QueryPackwerk::Reference.new(
@@ -31,8 +32,8 @@ module QueryPackwerk
             file: reference.fetch('file'),
             line: reference.fetch('line'),
             column: reference.fetch('column'),
-            producing_pack: packages[reference.fetch('defining_pack_name')] ||= package(reference.fetch('defining_pack_name')),
-            consuming_pack: packages[reference.fetch('referencing_pack_name')] ||= package(reference.fetch('referencing_pack_name')),
+            producing_pack: pack.call(reference.fetch('defining_pack_name')),
+            consuming_pack: pack.call(reference.fetch('referencing_pack_name')),
             violations: reference.fetch('violations').map do |violation|
               QueryPackwerk::Reference::Violation.new(
                 type: violation.fetch('violation_type'),
