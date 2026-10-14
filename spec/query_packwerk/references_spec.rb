@@ -114,6 +114,16 @@ RSpec.describe QueryPackwerk::References do
     end
   end
 
+  describe '#load_sources!' do
+    it 'prints a dot for each file it parses, rather than for each reference' do
+      references = described_class.where(producing_pack: 'packs/honey_production')
+
+      expect { references.load_sources! }.to output(
+        /\APrepopulating AST cache with 5 files: \n\.{5}\nAST cache loaded in \S+\nPrepopulating sources cache with 8 references\nLoaded 9 full sources in \S+\n\z/
+      ).to_stderr
+    end
+  end
+
   describe '#file_count' do
     it 'counts each file once, however many references are in it' do
       expect(described_class.all.file_count).to eq(6)

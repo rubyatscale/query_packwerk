@@ -66,13 +66,11 @@ module QueryPackwerk
         warn
       end
 
-      warn "Prepopulating sources cache with #{count} #{self.class.name.to_s.split('::').last.to_s.downcase}: "
+      warn "Prepopulating sources cache with #{count} #{self.class.name.to_s.split('::').last.to_s.downcase}"
       start_time = Time.now
 
-      total_sources_loaded = @original_collection.sum do |use|
-        $stderr.print '.'
-        use.sources.size
-      end
+      # No dot for each use: parsing, which load_cache! dots, is the slow part
+      total_sources_loaded = @original_collection.sum { |use| use.sources.size }
 
       finish_time = Time.now - start_time
       warn "Loaded #{total_sources_loaded} full sources in #{finish_time}"
