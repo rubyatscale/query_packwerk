@@ -91,6 +91,9 @@ query_packwerk:001:0> references_for("pack_name")
 # Get the 'shape' of the references to a pack that break no rule
 query_packwerk:001:0> References.where(producing_pack: "packs/pack_name", allowed: true).anonymous_source_counts
 
+# Get the references to a pack that break a rule no package_todo.yml records, which `pks check` reports
+query_packwerk:001:0> References.where(producing_pack: "packs/pack_name", unrecorded: true)
+
 # Get all references from a pack to other packs' constants
 query_packwerk:001:0> references_from("pack_name")
 

@@ -76,6 +76,21 @@ RSpec.describe QueryPackwerk::References do
       )
     end
 
+    it 'finds the references that break a rule no package_todo.yml records' do
+      expect(described_class.where(unrecorded: true).map(&:location)).to eq(
+        [
+          'packs/apiary_reports/app/services/apiary_report.rb:2',
+          'packs/apiary_reports/app/services/apiary_report.rb:4',
+          'packs/hive_dashboard/app/models/hive.rb:2',
+          'packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:8',
+          'packs/hive_dashboard/app/services/report_link.rb:2'
+        ]
+      )
+      expect(described_class.where(unrecorded_violation_types: 'dependency').map(&:location)).to eq(
+        ['packs/hive_dashboard/app/services/report_link.rb:2']
+      )
+    end
+
     it 'finds the references to a pack without an owner' do
       expect(described_class.where(owned: false).map(&:constant_name)).to eq(['::ApiaryReportCard'])
     end

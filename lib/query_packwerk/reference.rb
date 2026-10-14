@@ -98,6 +98,12 @@ module QueryPackwerk
       violations.map(&:type)
     end
 
+    # The types of the rules it breaks that no package_todo.yml records, which `pks check` reports
+    sig { returns(T::Array[String]) }
+    def unrecorded_violation_types
+      violations.reject(&:recorded).map(&:type)
+    end
+
     sig { returns(String) }
     def location
       line ? "#{file}:#{line}" : file
@@ -127,6 +133,10 @@ module QueryPackwerk
         violation_types: lambda(&:violation_types),
         privacy: ->(reference) { reference.violation_types.include?('privacy') },
         dependency: ->(reference) { reference.violation_types.include?('dependency') },
+
+        # Which of those no package_todo.yml records
+        unrecorded: ->(reference) { reference.unrecorded_violation_types.any? },
+        unrecorded_violation_types: lambda(&:unrecorded_violation_types),
 
         # Which pack defines the constant, and which pack's code uses it
         consuming_pack: ->(reference) { reference.consuming_pack.name },

@@ -86,6 +86,7 @@ RSpec.describe QueryPackwerk::Reference do
       expect(reference.violations.map { |violation| [violation.type, violation.recorded] }).to eq(
         [['dependency', true], ['privacy', false]]
       )
+      expect(reference.unrecorded_violation_types).to eq(['privacy'])
       expect(reference.deconstruct_keys(%i[violation_types dependency privacy])).to eq(
         violation_types: %w[dependency privacy], dependency: true, privacy: true
       )

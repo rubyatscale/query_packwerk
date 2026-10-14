@@ -108,6 +108,7 @@ module QueryPackwerk
         .consuming_pack         # Returns the Package whose file makes the reference
         .violations             # Returns the rules the reference breaks, with each one's type and whether it's strict and recorded
         .violation_types        # Returns the types of the rules the reference breaks
+        .unrecorded_violation_types # Returns the types of those rules that no package_todo.yml records, which pks check reports
         .allowed?               # Returns whether the reference breaks none of the rules
         .sources                # Returns array of AST nodes representing the reference
         .sources_with_locations # Returns array of [file:line, source] pairs
@@ -127,7 +128,7 @@ module QueryPackwerk
         These come from pks 0.7.0 or later (https://github.com/rubyatscale/pks), in bin/pks or on your PATH.
 
         References.all          # Returns all references
-        References.where(conditions) # Returns new References filtered by conditions, as allowed: true or violation_types: 'privacy'
+        References.where(conditions) # Returns new References filtered by conditions, as allowed: true, violation_types: 'privacy' or unrecorded: true
         .raw_sources            # Returns hash of constant => AST nodes for all references
         .sources                # Returns hash of constant => source strings for all references
         .sources_with_locations # Returns hash of constant => [file:line, source] pairs
