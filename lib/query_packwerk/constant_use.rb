@@ -46,6 +46,9 @@ module QueryPackwerk
 
     sig { params(cache: QueryPackwerk::FileCache).void }
     def set_cache!(cache)
+      # Each query sets the cache again, and a cache it already has is still loaded
+      return if cache.equal?(@file_cache)
+
       @cache_loaded = false
       @file_cache = cache
     end

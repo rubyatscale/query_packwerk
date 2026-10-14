@@ -10,6 +10,14 @@ RSpec.describe QueryPackwerk::FileCache do
       .map { |node| [node.loc.line, node.source] }
   end
 
+  describe '#load!' do
+    it 'prints a dot for each file it parses, and none for a file it has' do
+      write_file('app/models/account.rb', "class Account < ApplicationRecord\nend\n")
+
+      expect { file_cache.load!('app/models/account.rb', 'app/models/account.rb', headers: false) }.to output('.').to_stderr
+    end
+  end
+
   describe '#get_full_sources' do
     it 'finds references in the Ruby code of an ERB template, on their template lines' do
       write_file('app/views/invoices/show.html.erb', <<~ERB)

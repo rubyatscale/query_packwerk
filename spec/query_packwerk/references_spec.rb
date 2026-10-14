@@ -83,6 +83,20 @@ RSpec.describe QueryPackwerk::References do
 
       expect(described_class.where(producing_pack: 'packs/honey_production')).to be_empty
     end
+
+    it 'keeps the files that all parses, so each query parses a file only once' do
+      all = described_class.all
+
+      expect(described_class.where(allowed: true).file_cache).to equal(all.file_cache)
+      expect(all.including_files('app/**').file_cache).to equal(all.file_cache)
+      expect(all.excluding_files('app/**').file_cache).to equal(all.file_cache)
+    end
+  end
+
+  describe '#file_count' do
+    it 'counts each file once, however many references are in it' do
+      expect(described_class.all.file_count).to eq(5)
+    end
   end
 
   describe '#sources_with_locations' do

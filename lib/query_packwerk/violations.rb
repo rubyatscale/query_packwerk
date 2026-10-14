@@ -44,7 +44,8 @@ module QueryPackwerk
         ).returns(QueryPackwerk::Violations)
       end
       def where(**query_params, &query_fn)
-        QueryPackwerk::Violations.new(super(**query_params, &query_fn))
+        # all's file cache, so a file is parsed once for every query until reload!
+        QueryPackwerk::Violations.new(super(**query_params, &query_fn), file_cache: all.file_cache)
       end
 
       sig { void }

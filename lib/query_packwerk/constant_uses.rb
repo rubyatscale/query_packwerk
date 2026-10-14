@@ -22,6 +22,9 @@ module QueryPackwerk
     sig { override.returns(T::Array[Elem]) }
     attr_reader :original_collection
 
+    sig { returns(QueryPackwerk::FileCache) }
+    attr_reader :file_cache
+
     sig do
       params(
         original_collection: T::Array[Elem],
@@ -79,7 +82,8 @@ module QueryPackwerk
 
     sig { returns(Integer) }
     def file_count
-      @original_collection.sum(&:file_count)
+      # Once for each file, which is parsed once however many uses are in it
+      @original_collection.flat_map(&:files).uniq.size
     end
 
     sig { returns(T::Boolean) }
@@ -211,7 +215,7 @@ module QueryPackwerk
         T.unsafe(use).includes_files?(*file_globs) # Sorbet hates splats
       end
 
-      T.unsafe(self.class).new(filtered)
+      self.class.new(filtered, file_cache: @file_cache)
     end
 
     # Filter for those not in files that match one of the provided file globs
@@ -221,7 +225,7 @@ module QueryPackwerk
         T.unsafe(use).includes_files?(*file_globs) # Sorbet hates splats
       end
 
-      T.unsafe(self.class).new(filtered)
+      self.class.new(filtered, file_cache: @file_cache)
     end
 
     sig { returns(String) }

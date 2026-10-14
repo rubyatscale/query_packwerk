@@ -55,7 +55,8 @@ module QueryPackwerk
         ).returns(QueryPackwerk::References)
       end
       def where(**query_params, &query_fn)
-        QueryPackwerk::References.new(super(**query_params, &query_fn))
+        # all's file cache, so a file is parsed once for every query until reload!
+        QueryPackwerk::References.new(super(**query_params, &query_fn), file_cache: all.file_cache)
       end
 
       # Forgets the references, so the next query runs pks again

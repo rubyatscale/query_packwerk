@@ -41,6 +41,9 @@ module QueryPackwerk
       warn "Prepopulating AST cache with #{file_count} files: " if headers
 
       file_names.each do |f|
+        # A dot for each file parsed, rather than for each use of one
+        next if @file_ast_cache.key?(f)
+
         get_file_ast(f)
         $stderr.print '.'
       end
@@ -124,10 +127,12 @@ module QueryPackwerk
       params(file_name: String, line: Integer, column: Integer).returns(T.nilable(RuboCop::AST::Node))
     end
     def get_full_source_at(file_name:, line:, column:)
-      nodes = nodes_by_line(file_name).fetch(line, []).select do |node|
-        range = node.source_range
-        range.source_line[0, range.column].bytesize == column
-      end
+      source_line = get_file_ast(file_name).source_range.source_buffer.source_lines[line - 1]
+      return unless source_line
+
+      # Converted once, rather than for each node, as on a line with thousands of references
+      character_column = source_line.byteslice(0, column).to_s.length
+      nodes = nodes_by_line(file_name).fetch(line, []).select { |node| node.source_range.column == character_column }
 
       # The outermost constant, as `Foo::Bar` rather than the `Foo` in it
       node = nodes.find(&:const_type?) || nodes.find(&:send_type?)
