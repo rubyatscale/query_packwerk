@@ -98,6 +98,25 @@ RSpec.describe QueryPackwerk::Reference do
     expect(reference_at('app/services/apiary_summary.rb:2').violations.map(&:strict)).to eq([true])
   end
 
+  context 'when the app is loaded with Rails' do
+    before do
+      stub_const('Rails', Module.new)
+      application_record = stub_const('ApplicationRecord', Class.new)
+      stub_const('HoneyProductionNectar', Class.new(application_record))
+      stub_const('ApiaryReportCard', Class.new)
+    end
+
+    it 'says whether its constant is an Active Record model' do
+      expect(
+        [
+          'packs/apiary_reports/app/services/apiary_report.rb:2',
+          'packs/hive_dashboard/app/services/report_link.rb:2',
+          'app/services/apiary_summary.rb:2'
+        ].map { |location| reference_at(location).deconstruct_keys([:is_active_record]).fetch(:is_active_record) }
+      ).to eq([true, false, false])
+    end
+  end
+
   it 'is allowed when it breaks no rule' do
     reference = reference_at('packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:12')
 

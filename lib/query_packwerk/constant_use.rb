@@ -188,7 +188,8 @@ module QueryPackwerk
         value = @file_cache.set(
           :is_active_record,
           key: class_name,
-          value: constant.is_a?(Class) && constant < ApplicationRecord
+          # Class#< gives nil, not false, for a class that isn't related
+          value: constant.is_a?(Class) && (constant < ApplicationRecord || false)
         )
 
         runtime_values[:is_active_record] = value
