@@ -92,7 +92,8 @@ module QueryPackwerk
   end
 
   # Get all references from this package to other packages' constants, whether
-  # or not they break the packages' rules (i.e., how this package uses others)
+  # or not they break the packages' rules (i.e., how this package uses others).
+  # These come from pks too.
   sig { params(pack_name: String).returns(QueryPackwerk::References) }
   def references_from(pack_name)
     QueryPackwerk::References.where(consuming_pack: full_name(pack_name))

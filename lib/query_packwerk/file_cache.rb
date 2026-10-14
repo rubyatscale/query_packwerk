@@ -174,7 +174,7 @@ module QueryPackwerk
       error = source.diagnostics.find { |diagnostic| diagnostic.level == :error }
       location = error ? "#{file_name}:#{error.location.line} (#{error.message})" : file_name
 
-      warn "Could not parse #{location}, so its violations are not included"
+      warn "Could not parse #{location}, so its sources are not included"
     end
 
     # Turns a string into a Ruby AST

@@ -98,9 +98,9 @@ query_packwerk:001:0> references_from("pack_name")
 query_packwerk:001:0> References.all
 ```
 
-References have the same methods as violations, like `sources_with_locations` and `anonymous_source_counts`. Each one is where pks finds it, so its source is found even where the code names a constant relatively, as `Bar` inside `module Foo`. A reference that pks infers from an association, as `has_many :tacos` does for `Taco`, has the association as its source. pks gives no positions in ERB templates, so there a reference's sources are wherever the template names the constant. Finding sources parses each file they're in, which for a pack that thousands of files reference takes a while.
+References have the same methods as violations, like `sources_with_locations` and `anonymous_source_counts`. Each one is where pks finds it, so its source is found even where the code names a constant relatively, as `Bar` inside `module Foo`. A reference that pks infers from an association, as `has_many :tacos` does for `Taco`, has the association as its source. pks gives no positions in ERB templates, so there a reference's sources are wherever the template names the constant. Finding sources parses each file they're in, which for a pack that thousands of files reference takes a while, and keeps each one in memory, about 200 KB for a file of 100 lines, until `reload!`.
 
-If you change any of the package.yml or package_todo.yml files, you can reload the running console:
+If you change your code or any of the package.yml or package_todo.yml files, you can reload the running console:
 
 ```ruby
 # Reset the cache, so the next query of references runs pks again

@@ -69,7 +69,7 @@ module QueryPackwerk
         .sources_with_locations # Returns array of [file:line, source] pairs for each violation
         .source_counts          # Returns hash of how often each violation source occurs
         .anonymous_sources      # Returns array of violation sources with arguments anonymized
-        .anonymous_sources_with_locations # Returns array of [file:line, source] pairs for each violation with arguments anonymized
+        .anonymous_sources_with_locations # Returns hash of anonymized source => [file:line]
         .count                  # Returns total number of violation occurrences
       HELP
     end
@@ -84,11 +84,11 @@ module QueryPackwerk
         .sources                # Returns hash of constant => source strings for all violations
         .sources_with_locations # Returns hash of constant => [file:line, source] pairs
         .source_counts          # Returns hash of constant => {source => count} with occurrence counts
-        .sources_with_contexts  # Returns hash of constant => [file:line, source] pairs for each violation with context
+        .sources_with_contexts  # Returns hash of constant => {anonymized source => [file:line with the lines around it]}
         .anonymous_sources      # Returns hash of constant => anonymized sources
-        .anonymous_sources_with_locations # Returns array of [file:line, source] pairs for each violation with arguments anonymized
-        .consumers(threshold)   # Returns hash of consuming package names and violation counts
-        .producers(threshold)   # Returns hash of producing package names and violation counts
+        .anonymous_sources_with_locations # Returns hash of constant => {anonymized source => [file:line]}
+        .consumers(threshold: 0) # Returns hash of consuming package names and violation counts
+        .producers(threshold: 0) # Returns hash of producing package names and violation counts
         .including_files(globs) # Returns new Violations filtered to include specific files
         .excluding_files(globs) # Returns new Violations filtered to exclude specific files
       HELP
@@ -102,6 +102,7 @@ module QueryPackwerk
         .constant_name          # Returns the referenced constant's name
         .file                   # Returns the file that makes the reference
         .line                   # Returns the line of the reference, or nil in an ERB template
+        .column                 # Returns the column of the reference in bytes from 0, or nil in an ERB template
         .location               # Returns file:line, or the file for an ERB template
         .producing_pack         # Returns the Package that defines the constant
         .consuming_pack         # Returns the Package whose file makes the reference
@@ -110,7 +111,9 @@ module QueryPackwerk
         .allowed?               # Returns whether the reference breaks none of the rules
         .sources                # Returns array of AST nodes representing the reference
         .sources_with_locations # Returns array of [file:line, source] pairs
+        .source_counts          # Returns hash of how often each source occurs
         .anonymous_sources      # Returns array of sources with arguments anonymized
+        .anonymous_sources_with_locations # Returns hash of anonymized source => [file:line]
         .count                  # Returns how many sources make the reference, which is more than one only in an ERB template
       HELP
     end
@@ -125,15 +128,16 @@ module QueryPackwerk
 
         References.all          # Returns all references
         References.where(conditions) # Returns new References filtered by conditions, as allowed: true or violation_types: 'privacy'
+        .raw_sources            # Returns hash of constant => AST nodes for all references
         .sources                # Returns hash of constant => source strings for all references
         .sources_with_locations # Returns hash of constant => [file:line, source] pairs
         .source_counts          # Returns hash of constant => {source => count} with occurrence counts
-        .sources_with_contexts  # Returns hash of constant => [file:line, source] pairs for each reference with context
+        .sources_with_contexts  # Returns hash of constant => {anonymized source => [file:line with the lines around it]}
         .anonymous_sources      # Returns hash of constant => anonymized sources
-        .anonymous_sources_with_locations # Returns array of [file:line, source] pairs for each reference with arguments anonymized
+        .anonymous_sources_with_locations # Returns hash of constant => {anonymized source => [file:line]}
         .anonymous_source_counts # Returns hash of constant => {anonymized source => count}
-        .consumers(threshold)   # Returns hash of consuming package names and reference counts
-        .producers(threshold)   # Returns hash of producing package names and reference counts
+        .consumers(threshold: 0) # Returns hash of consuming package names and reference counts
+        .producers(threshold: 0) # Returns hash of producing package names and reference counts
         .including_files(globs) # Returns new References filtered to include specific files
         .excluding_files(globs) # Returns new References filtered to exclude specific files
       HELP

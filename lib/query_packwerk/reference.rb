@@ -5,7 +5,7 @@ module QueryPackwerk
   # A reference from one pack to a constant that another pack defines, as pks
   # lists it, whether or not it breaks the packs' rules. Unlike a Violation,
   # which package_todo.yml records by file, it's at one place in one file, so
-  # its sources are the code there.
+  # its source is the code there, except in ERB, where pks gives no place.
   class Reference < ConstantUse
     extend T::Sig
 

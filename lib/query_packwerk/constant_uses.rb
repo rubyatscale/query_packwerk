@@ -4,9 +4,9 @@
 require 'coderay'
 
 module QueryPackwerk
-  # A collection of ConstantUses, such as Violations or References, with
-  # methods that group their sources by the constant they use, and that say
-  # which packs use and define those constants.
+  # The base of Violations and References, which are collections of ConstantUse
+  # objects, with methods that group their sources by the constant they use,
+  # and that say which packs use and define those constants.
   class ConstantUses
     extend T::Sig
     extend T::Generic

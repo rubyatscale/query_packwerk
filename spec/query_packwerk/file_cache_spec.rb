@@ -89,7 +89,7 @@ RSpec.describe QueryPackwerk::FileCache do
       expect do
         sources_in('app/views/invoices/show.html.erb')
         sources_in('app/views/invoices/show.html.erb', class_name: '::Billing::Payment')
-      end.to output(%r{\ACould not parse app/views/invoices/show\.html\.erb:4 \(.+\), so its violations are not included\n\z})
+      end.to output(%r{\ACould not parse app/views/invoices/show\.html\.erb:4 \(.+\), so its sources are not included\n\z})
         .to_stderr
       expect(sources_in('app/views/invoices/show.html.erb')).to eq([])
     end
