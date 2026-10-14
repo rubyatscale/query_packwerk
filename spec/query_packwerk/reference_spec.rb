@@ -66,6 +66,38 @@ RSpec.describe QueryPackwerk::Reference do
     end
   end
 
+  describe 'a reference in a file that names its constant elsewhere too' do
+    subject(:reference) { reference_at('packs/apiary_reports/app/services/apiary_report.rb:2') }
+
+    it 'has only the source where pks says it is' do
+      expect(reference.count).to eq(1)
+      expect(reference.source_counts).to eq('HoneyProductionNectar.count' => 1)
+      expect(reference.anonymous_sources_with_locations).to eq(
+        'HoneyProductionNectar.count' => ['packs/apiary_reports/app/services/apiary_report.rb:2']
+      )
+      expect(reference.sources_with_contexts(start_offset: 0, end_offset: 0)).to eq(
+        'HoneyProductionNectar.count' => [
+          "> packs/apiary_reports/app/services/apiary_report.rb:2 (L2..2)\n\ndef nectar_count = HoneyProductionNectar.count\n"
+        ]
+      )
+    end
+
+    it 'says which rules it breaks, and which of them a package_todo.yml records' do
+      expect(reference.violations.map { |violation| [violation.type, violation.recorded] }).to eq(
+        [['dependency', true], ['privacy', false]]
+      )
+      expect(reference.deconstruct_keys(%i[violation_types dependency privacy])).to eq(
+        violation_types: %w[dependency privacy], dependency: true, privacy: true
+      )
+    end
+  end
+
+  it 'says whether the pack that enforces a rule is strict about it' do
+    listed_references.first['violations'] = [{ 'violation_type' => 'privacy', 'strict' => true, 'recorded' => false }]
+
+    expect(reference_at('app/services/apiary_summary.rb:2').violations.map(&:strict)).to eq([true])
+  end
+
   it 'is allowed when it breaks no rule' do
     reference = reference_at('packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:12')
 

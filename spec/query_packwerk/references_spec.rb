@@ -15,6 +15,7 @@ RSpec.describe QueryPackwerk::References do
           'packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:4',
           'packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:8',
           'packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:12',
+          'packs/hive_dashboard/app/services/report_link.rb:2',
           'packs/hive_dashboard/app/views/apiaries/show.html.erb'
         ]
       )
@@ -69,9 +70,14 @@ RSpec.describe QueryPackwerk::References do
       expect(described_class.where(violation_types: 'dependency').map(&:location)).to eq(
         [
           'packs/apiary_reports/app/services/apiary_report.rb:2',
-          'packs/apiary_reports/app/services/apiary_report.rb:4'
+          'packs/apiary_reports/app/services/apiary_report.rb:4',
+          'packs/hive_dashboard/app/services/report_link.rb:2'
         ]
       )
+    end
+
+    it 'finds the references to a pack without an owner' do
+      expect(described_class.where(owned: false).map(&:constant_name)).to eq(['::ApiaryReportCard'])
     end
 
     it 'finds the references from a pack' do
@@ -95,7 +101,7 @@ RSpec.describe QueryPackwerk::References do
 
   describe '#file_count' do
     it 'counts each file once, however many references are in it' do
-      expect(described_class.all.file_count).to eq(5)
+      expect(described_class.all.file_count).to eq(6)
     end
   end
 
@@ -117,6 +123,9 @@ RSpec.describe QueryPackwerk::References do
           ],
           '::Beekeeping::NectarSource' => [
             ['packs/hive_dashboard/app/services/beekeeping/apiary_status.rb:8', 'NectarSource.where(apiary_id: 1).pluck(:name)']
+          ],
+          '::ApiaryReportCard' => [
+            ['packs/hive_dashboard/app/services/report_link.rb:2', 'ApiaryReportCard.new']
           ]
         }
       )
@@ -138,13 +147,33 @@ RSpec.describe QueryPackwerk::References do
 
   describe '#consumers' do
     it 'counts the references from each pack' do
-      expect(described_class.all.consumers).to eq('packs/hive_dashboard' => 5, 'packs/apiary_reports' => 2, '.' => 1)
+      expect(described_class.all.consumers).to eq('packs/hive_dashboard' => 6, 'packs/apiary_reports' => 2, '.' => 1)
+    end
+  end
+
+  describe '#producers' do
+    it 'counts the references to each pack' do
+      expect(described_class.all.producers).to eq('packs/honey_production' => 8, 'packs/apiary_reports' => 1)
     end
   end
 
   describe '#including_files' do
     it 'finds the references in files that match' do
       references = described_class.all.including_files('packs/apiary_reports/**')
+
+      expect(references).to be_a(described_class)
+      expect(references.map(&:location)).to eq(
+        [
+          'packs/apiary_reports/app/services/apiary_report.rb:2',
+          'packs/apiary_reports/app/services/apiary_report.rb:4'
+        ]
+      )
+    end
+  end
+
+  describe '#excluding_files' do
+    it 'finds the references in files that do not match' do
+      references = described_class.all.excluding_files('packs/hive_dashboard/**', 'app/**')
 
       expect(references).to be_a(described_class)
       expect(references.map(&:location)).to eq(

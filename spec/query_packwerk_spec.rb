@@ -162,7 +162,8 @@ RSpec.describe QueryPackwerk do
       expect(described_class.references_from('hive_dashboard').map(&:constant_name).tally).to eq(
         '::HoneyProductionNectar' => 3,
         '::Beekeeping::NectarSource' => 1,
-        '::Beekeeping::Nectars' => 1
+        '::Beekeeping::Nectars' => 1,
+        '::ApiaryReportCard' => 1
       )
     end
 

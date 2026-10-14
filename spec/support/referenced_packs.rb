@@ -3,7 +3,8 @@
 
 # An app whose packs reference each other's constants in each way that pks
 # lists: allowed or not, recorded in a package_todo.yml or not, by a relative
-# name, through an association, in ERB, and after multibyte characters.
+# name, through an association, in ERB, after multibyte characters, and to a
+# pack without an owner.
 RSpec.shared_context 'referenced packs' do
   # QueryPackwerk keeps the packs it finds, so it'd keep these from, or for,
   # specs that write other packs
@@ -91,6 +92,11 @@ RSpec.shared_context 'referenced packs' do
           has_many :honey_production_nectars, dependent: :destroy
         end
       RUBY
+      'packs/hive_dashboard/app/services/report_link.rb' => <<~RUBY,
+        class ReportLink
+          def card = ApiaryReportCard.new
+        end
+      RUBY
       'packs/hive_dashboard/app/views/apiaries/show.html.erb' => <<~ERB,
         <% if HoneyProductionNectar.as_of_now.exists?(apiary_id: @apiary.id) %>
           <p><%= HoneyProductionNectar.as_of_now.find_by(apiary_id: @apiary.id).volume %></p>
@@ -101,6 +107,10 @@ RSpec.shared_context 'referenced packs' do
           def nectar_count = HoneyProductionNectar.count
 
           def title = "Récolte 🍯 #{HoneyProductionNectar.model_name.human}"
+        end
+      RUBY
+      'packs/apiary_reports/app/public/apiary_report_card.rb' => <<~RUBY,
+        class ApiaryReportCard
         end
       RUBY
       'app/services/apiary_summary.rb' => <<~RUBY
@@ -124,6 +134,7 @@ RSpec.shared_context 'referenced packs' do
           {"file": "packs/hive_dashboard/app/services/beekeeping/apiary_status.rb", "line": 4, "column": 6, "constant_name": "::HoneyProductionNectar", "referencing_pack_name": "packs/hive_dashboard", "defining_pack_name": "packs/honey_production", "violations": [{"violation_type": "privacy", "strict": false, "recorded": true}]},
           {"file": "packs/hive_dashboard/app/services/beekeeping/apiary_status.rb", "line": 8, "column": 6, "constant_name": "::Beekeeping::NectarSource", "referencing_pack_name": "packs/hive_dashboard", "defining_pack_name": "packs/honey_production", "violations": [{"violation_type": "privacy", "strict": false, "recorded": false}]},
           {"file": "packs/hive_dashboard/app/services/beekeeping/apiary_status.rb", "line": 12, "column": 6, "constant_name": "::Beekeeping::Nectars", "referencing_pack_name": "packs/hive_dashboard", "defining_pack_name": "packs/honey_production", "violations": []},
+          {"file": "packs/hive_dashboard/app/services/report_link.rb", "line": 2, "column": 13, "constant_name": "::ApiaryReportCard", "referencing_pack_name": "packs/hive_dashboard", "defining_pack_name": "packs/apiary_reports", "violations": [{"violation_type": "dependency", "strict": false, "recorded": false}]},
           {"file": "packs/hive_dashboard/app/views/apiaries/show.html.erb", "line": null, "column": null, "constant_name": "::HoneyProductionNectar", "referencing_pack_name": "packs/hive_dashboard", "defining_pack_name": "packs/honey_production", "violations": [{"violation_type": "privacy", "strict": false, "recorded": true}]}
         ]
       }

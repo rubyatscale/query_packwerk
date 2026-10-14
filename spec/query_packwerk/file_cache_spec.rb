@@ -167,6 +167,20 @@ RSpec.describe QueryPackwerk::FileCache do
       expect(source_at(6, 34)).to eq('Billing::Invoice.due_for(self).count')
     end
 
+    it 'finds a constant that no call is chained on, as an argument or a superclass' do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          def latest_number = Billing::Invoice.last&.number
+
+          def invoice?(record) = record.is_a?(Billing::Invoice)
+        end
+      RUBY
+
+      expect(source_at(1, 16)).to eq('ApplicationRecord')
+      expect(source_at(2, 22)).to eq('Billing::Invoice.last&.number')
+      expect(source_at(4, 38)).to eq('Billing::Invoice')
+    end
+
     it 'finds the call when no constant starts there, as for an association' do
       expect(source_at(2, 2)).to eq('has_many :invoices, dependent: :destroy')
     end
