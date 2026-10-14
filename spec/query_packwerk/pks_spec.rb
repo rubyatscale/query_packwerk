@@ -129,6 +129,12 @@ RSpec.describe QueryPackwerk::Pks do
       )
     end
 
+    it 'gets the version when pks prints more after it, as a build might' do
+      write_pks('bin/pks', version_output: 'pks 0.7.0 (abc1234)', references: [reference])
+
+      expect(described_class.list_references).to eq([reference])
+    end
+
     it 'says when it cannot get the version of pks' do
       write_pks('bin/pks', version_output: "error: unexpected argument '--version'")
 

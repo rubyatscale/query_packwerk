@@ -61,7 +61,7 @@ module QueryPackwerk
       def check_version(executable)
         # Only stdout, as a wrapper may warn on stderr first
         stdout, stderr, status = Open3.capture3(executable, '--version')
-        version = stdout[/^pks (\S+)$/, 1]
+        version = stdout[/^pks (\S+)/, 1]
         raise Error, "Could not get the version of #{executable}:\n#{stdout}#{stderr}" unless status.success? && version && Gem::Version.correct?(version)
 
         if Gem::Version.new(version) < MINIMUM_VERSION
