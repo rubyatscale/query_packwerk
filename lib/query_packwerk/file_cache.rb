@@ -68,8 +68,9 @@ module QueryPackwerk
         source = processed_source(ruby_source(file_name))
         warn_unparseable(file_name, source) unless source.valid_syntax?
 
-        # The AST is also nil for source with no code, like a template that's only HTML
-        source.ast || ast_from('x')
+        # The AST is also nil for source with no code, like a template that's only HTML.
+        # `nil` stands in, as it has no constant or call that a reference's position could match.
+        source.ast || ast_from('nil')
       end
     end
 
@@ -78,7 +79,7 @@ module QueryPackwerk
       @file_cache[file_name] ||= if (RUBY_FILE.match?(file_name) || ERB_FILE.match?(file_name)) && File.exist?(file_name)
                                    File.read(file_name)
                                  else
-                                   'x'
+                                   ''
                                  end
     end
 
@@ -93,7 +94,8 @@ module QueryPackwerk
       relative_const_node = ast_from(class_name.delete_prefix('::'))
 
       @file_const_cache[const_key] = get_file_ast(file_name).each_node.select do |node|
-        next false unless node.const_type?
+        # Not the `Foo` in `Foo::Bar`, which packwerk and pks count only as a use of `Foo::Bar`
+        next false unless node.const_type? && !node.parent&.const_type?
 
         node == absolute_const_node || node == relative_const_node
       end
@@ -177,8 +179,9 @@ module QueryPackwerk
     end
 
     # We can find a constant, but by going up its parents we can find the full call chain.
-    # We check if each parent is a receiver of the child, giving us method calls and
-    # arguments on a constant as well as where it occurred.
+    # We check that each parent is a call on the child, giving us method calls and
+    # arguments on a constant as well as where it occurred. The receiver must be the
+    # child itself, not an equal node, as the first `Foo` is to the second in `Foo.bar(Foo)`.
     sig { params(node: RuboCop::AST::Node).returns(RuboCop::AST::Node) }
     def get_full_receiver_chain(node)
       return node unless node.const_type?
@@ -186,7 +189,7 @@ module QueryPackwerk
       current_node = T.let(node, RuboCop::AST::Node)
 
       while (parent_node = current_node.parent)
-        break unless parent_node.receiver == current_node
+        break unless parent_node.call_type? && parent_node.receiver.equal?(current_node)
 
         current_node = parent_node
       end

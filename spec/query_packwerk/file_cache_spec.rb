@@ -101,6 +101,37 @@ RSpec.describe QueryPackwerk::FileCache do
 
       expect(sources_in('Gemfile.lock')).to eq([])
     end
+
+    it 'gets the calls on each use of the constant, rather than on an equal use around it' do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          def merge = Billing::Invoice.merge(Billing::Invoice)
+
+          def latest = Billing::Invoice.latest.then { Billing::Invoice.latest }
+        end
+      RUBY
+
+      expect(sources_in('app/models/account.rb')).to eq(
+        [
+          [2, 'Billing::Invoice.merge(Billing::Invoice)'],
+          [2, 'Billing::Invoice'],
+          [4, 'Billing::Invoice.latest.then'],
+          [4, 'Billing::Invoice.latest']
+        ]
+      )
+    end
+
+    it 'finds no use of a constant where it is only the namespace of another' do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          def billing = Billing.for(self)
+
+          def invoice = Billing::Invoice.for(self)
+        end
+      RUBY
+
+      expect(sources_in('app/models/account.rb', class_name: '::Billing')).to eq([[2, 'Billing.for(self)']])
+    end
   end
 
   describe '#get_full_source_at' do
@@ -134,6 +165,20 @@ RSpec.describe QueryPackwerk::FileCache do
 
     it 'finds nothing when nothing starts there' do
       expect(source_at(4, 23)).to be_nil
+    end
+
+    it 'finds the calls on the constant there, rather than on an equal one around it' do
+      write_file('app/models/account.rb', "def merge = Billing::Invoice.merge(Billing::Invoice)\n")
+
+      expect(source_at(1, 35)).to eq('Billing::Invoice')
+    end
+
+    it 'finds nothing in a file that does not exist or does not parse' do
+      write_file('app/models/broken.rb', "Billing::Invoice.find(\n")
+
+      expect(file_cache.get_full_source_at(file_name: 'app/models/missing.rb', line: 1, column: 0)).to be_nil
+      expect { expect(file_cache.get_full_source_at(file_name: 'app/models/broken.rb', line: 1, column: 0)).to be_nil }
+        .to output(%r{\ACould not parse app/models/broken\.rb}).to_stderr
     end
   end
 end
