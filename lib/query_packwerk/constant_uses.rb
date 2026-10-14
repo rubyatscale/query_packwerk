@@ -97,7 +97,7 @@ module QueryPackwerk
     end
 
     # Gets all sources and their receiving chains grouped by the constant they use.
-    sig { returns(T.untyped) }
+    sig { returns(T::Hash[String, T::Array[RuboCop::AST::Node]]) }
     def raw_sources
       load_sources!
 
@@ -116,7 +116,7 @@ module QueryPackwerk
 
     # In addition to the above also provide the file location and line number along with the
     # source.
-    sig { returns(T::Hash[String, T::Array[String]]) }
+    sig { returns(T::Hash[String, T::Array[[String, String]]]) }
     def sources_with_locations
       load_sources!
 

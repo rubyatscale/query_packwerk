@@ -81,7 +81,7 @@ module QueryPackwerk
     end
 
     # Adds additional file and line number information to each source
-    sig { returns(T::Array[T.any(String, T::Array[RuboCop::AST::Node])]) }
+    sig { returns(T::Array[[String, String]]) }
     def sources_with_locations
       load_cache!
 
@@ -112,8 +112,7 @@ module QueryPackwerk
       end
     end
 
-    # sig { returns(T::Array[T.any(String, T::Array[String])]) }
-    sig { returns(T.untyped) }
+    sig { returns(T::Hash[String, T::Array[String]]) }
     def anonymous_sources_with_locations
       load_cache!
 
@@ -130,7 +129,7 @@ module QueryPackwerk
       end
     end
 
-    sig { params(start_offset: Integer, end_offset: Integer).returns(T.untyped) }
+    sig { params(start_offset: Integer, end_offset: Integer).returns(T::Hash[String, T::Array[String]]) }
     def sources_with_contexts(start_offset: 3, end_offset: 3)
       load_cache!
 

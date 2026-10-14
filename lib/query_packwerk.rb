@@ -54,7 +54,7 @@ module QueryPackwerk
   end
 
   # Get where the violations occurred (where other packages access this package)
-  sig { params(pack_name: String).returns(T::Hash[String, T::Array[String]]) }
+  sig { params(pack_name: String).returns(T::Hash[String, T::Array[[String, String]]]) }
   def violation_sources_for(pack_name)
     violations_for(pack_name).sources_with_locations
   end
