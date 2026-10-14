@@ -61,7 +61,7 @@ module QueryPackwerk
       end
 
       # Forgets the references, so the next query runs pks again
-      sig { void }
+      sig { returns(NilClass) }
       def reload!
         @all = nil
       end

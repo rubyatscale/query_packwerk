@@ -45,7 +45,7 @@ module QueryPackwerk
         QueryPackwerk::Packages.new(super)
       end
 
-      sig { void }
+      sig { returns(NilClass) }
       def reload!
         @all = nil
       end

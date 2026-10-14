@@ -107,12 +107,14 @@ module QueryPackwerk
     "packs/#{pack_name}"
   end
 
-  sig { void }
+  # nil rather than void, which the console shows as T::Private::Types::Void::VOID
+  sig { returns(NilClass) }
   def reload!
     # ParsePackwerk keeps the packs it reads, along with their package_todo.yml files
     ParsePackwerk.bust_cache!
     Packages.reload!
     Violations.reload!
     References.reload!
+    nil
   end
 end

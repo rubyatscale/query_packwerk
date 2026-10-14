@@ -185,6 +185,11 @@ RSpec.describe QueryPackwerk do
       expect(QueryPackwerk::Pks).to have_received(:list_references).twice
     end
 
+    it 'returns nil, which the console shows plainly, as do the reload! of each collection' do
+      expect(described_class.reload!).to be_nil
+      expect([QueryPackwerk::Packages, QueryPackwerk::Violations, QueryPackwerk::References].map(&:reload!)).to eq([nil, nil, nil])
+    end
+
     it 'reads the package_todo.yml files again' do
       expect(described_class.todos_for('apiary_reports').count).to eq(1)
 

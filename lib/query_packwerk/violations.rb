@@ -48,7 +48,7 @@ module QueryPackwerk
         QueryPackwerk::Violations.new(super(**query_params, &query_fn), file_cache: all.file_cache)
       end
 
-      sig { void }
+      sig { returns(NilClass) }
       def reload!
         @all = nil
       end
