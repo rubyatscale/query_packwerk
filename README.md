@@ -150,6 +150,8 @@ QueryPackwerk.anonymous_violation_counts_for("my_pack", threshold: 3)
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
+The specs for references use what pks lists for an app they write, and one spec checks that against pks itself. It runs where pks is on your `PATH`, as in CI. To install the version it checks against, run `bin/install-pks` and add `tmp/pks` to your `PATH`.
+
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, bump `VERSION` in `lib/query_packwerk/version.rb` in your PR and run `bundle install` so `Gemfile.lock` matches. When the PR is merged and CI passes on `main`, the gem is tagged and published to RubyGems automatically. Merges that don't change the version don't publish anything.
 
 ## Contributing

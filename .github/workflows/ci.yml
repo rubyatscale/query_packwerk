@@ -12,3 +12,6 @@ jobs:
       contents: read
     uses: rubyatscale/shared-config/.github/workflows/ci.yml@main # zizmor: ignore[unpinned-uses,secrets-inherit] internal reusable workflow tracked at @main by convention so shared-config updates propagate automatically; its ci.yml reads SLACK_WEBHOOK_URL but declares no workflow_call secrets, so inherit is the only way to pass it
     secrets: inherit
+    with:
+      # With pks, spec/query_packwerk/pks_spec.rb checks the references that the specs use against what pks lists
+      test-command: bin/install-pks && PATH="$PWD/tmp/pks:$PATH" bundle exec rspec

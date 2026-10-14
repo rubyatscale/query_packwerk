@@ -47,7 +47,10 @@ RSpec.describe QueryPackwerk::Pks do
         begin
           described_class.executable
         rescue QueryPackwerk::Pks::Error => e
-          skip e.message
+          # CI installs pks with bin/install-pks, so there the check runs rather than skips
+          raise if ENV['CI']
+
+          skip "#{e.message}\nTo install it here, run bin/install-pks and put tmp/pks on your PATH."
         end
 
         expect(described_class.list_references).to eq(listed_references)

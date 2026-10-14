@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Installs pks in tmp/pks, as CI does, so pks_spec.rb checks the specs' listing against pks.
+# Keep version at QueryPackwerk::Pks::MINIMUM_VERSION, with each archive's sha256.
+set -euo pipefail
+
+version=0.7.0
+case "$(uname -sm)" in
+  'Linux x86_64')
+    target=x86_64-unknown-linux-gnu
+    sha256=51b8fb321a463769d59b99a1be2832fca035c92729e0bc26ecaca88c0dc9baa7
+    ;;
+  'Darwin arm64')
+    target=aarch64-apple-darwin
+    sha256=0c360f17e1d4e617711d9dce5869e2034841fa584a911b1d7b831ce536ed500e
+    ;;
+  *)
+    echo "bin/install-pks has no pks $version for $(uname -sm)" >&2
+    exit 1
+    ;;
+esac
+
+archive="tmp/pks/pks-$target.tar.xz"
+mkdir -p tmp/pks
+curl --proto '=https' --tlsv1.2 -fsSL -o "$archive" \
+  "https://github.com/rubyatscale/pks/releases/download/v$version/pks-$target.tar.xz"
+
+actual=$(shasum -a 256 "$archive" 2> /dev/null || sha256sum "$archive")
+if [ "${actual%% *}" != "$sha256" ]; then
+  echo "$archive's sha256 is ${actual%% *}, not $sha256" >&2
+  exit 1
+fi
+
+tar -xJf "$archive" -C tmp/pks --strip-components 1 "pks-$target/pks"
+tmp/pks/pks --version
