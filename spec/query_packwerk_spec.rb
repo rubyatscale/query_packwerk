@@ -165,6 +165,10 @@ RSpec.describe QueryPackwerk do
         '::Beekeeping::Nectars' => 1
       )
     end
+
+    it 'takes the name of a pack outside packs/, as the root pack' do
+      expect(described_class.references_from('.').map(&:location)).to eq(['app/services/apiary_summary.rb:2'])
+    end
   end
 
   describe '#reload!' do

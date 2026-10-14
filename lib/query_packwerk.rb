@@ -101,7 +101,7 @@ module QueryPackwerk
   # In case anyone is still using shorthand for pack names
   sig { params(pack_name: String).returns(String) }
   def full_name(pack_name)
-    return pack_name if pack_name.match?(%r{\A(packs|components)/})
+    return pack_name if pack_name.match?(%r{\A(packs|components)/}) || ParsePackwerk.find(pack_name)
 
     "packs/#{pack_name}"
   end
