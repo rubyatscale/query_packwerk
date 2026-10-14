@@ -48,7 +48,19 @@ module QueryPackwerk
     end
 
     alias length size
-    alias count size
+
+    # Not an alias of size, so that an item or a block counts what it matches, as in Enumerable
+    sig do
+      params(
+        args: T.untyped,
+        block: T.nilable(T.proc.params(arg0: Elem).returns(T.untyped))
+      ).returns(Integer)
+    end
+    def count(*args, &block)
+      return size if args.empty? && block.nil?
+
+      T.unsafe(original_collection).count(*args, &block)
+    end
 
     # Extend the class with class extensions whenever this module is
     # included so we get both singleton and instance methods we need for
@@ -99,13 +111,19 @@ module QueryPackwerk
         query_keys = query_params.keys
         all_values = all
 
-        accepted_keys = all_values.first.deconstruct_keys(nil).keys
+        # Keys are checked against the first value, and with none, nothing can match
+        first_value = all_values.first
+        return [] unless first_value
+
+        accepted_keys = first_value.deconstruct_keys(nil).keys
         invalid_keys = query_keys - accepted_keys
 
         raise ArgumentError, "The following keys are invalid for querying: #{invalid_keys.join(', ')}" if invalid_keys.any?
 
         all_values.select do |value|
-          next yield(value) if block_given?
+          # A block narrows what the keys find, rather than taking their place
+          next false if block_given? && !yield(value)
+          next true if query_keys.empty?
 
           object_params = value.deconstruct_keys(query_keys)
 

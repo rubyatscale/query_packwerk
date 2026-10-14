@@ -105,11 +105,32 @@ RSpec.describe QueryPackwerk::QueryInterface do
     it 'can check for multiple potential Array matches' do
       expect(people.where(hobbies: %w[piano fencing]).count).to eq(2)
     end
+
+    it 'can narrow what conditions find with a block' do
+      expect(people.where(adult: true) { |a_person| a_person.sex == 'male' }.map(&:name)).to eq(['Bob'])
+    end
+
+    it 'can find people with only a block' do
+      expect(people.where { |a_person| a_person.sex == 'male' }.map(&:name)).to eq(%w[Bob Kai])
+    end
+
+    context 'when there are no people' do
+      let(:all_people) { [] }
+
+      it 'finds nobody' do
+        expect(people.where(adult: true).count).to eq(0)
+      end
+    end
   end
 
   describe '#count' do
     it 'can get the count/size/length of a query' do
       expect(people.all.count).to eq(4)
+    end
+
+    it 'counts what an item or a block matches, as Enumerable does' do
+      expect(people.all.count { |a_person| a_person.age >= 18 }).to eq(3)
+      expect(people.all.count(all_people.first)).to eq(1)
     end
   end
 

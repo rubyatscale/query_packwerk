@@ -1,24 +1,16 @@
 # typed: strict
 # frozen_string_literal: true
 
-require 'coderay'
-
 module QueryPackwerk
   # A collection class for managing and querying sets of Packwerk violations.
   # Provides aggregation, filtering, and analysis methods for violation data,
   # including source extraction, contextual reporting, and consumer relationship mapping.
   # Implements Enumerable and QueryInterface for flexible data manipulation.
-  class Violations
+  class Violations < ConstantUses
     extend T::Sig
     extend T::Generic
 
     Elem = type_member { { fixed: QueryPackwerk::Violation } }
-
-    include Enumerable
-    include QueryInterface
-
-    sig { override.returns(T::Array[QueryPackwerk::Violation]) }
-    attr_reader :original_collection
 
     @all = T.let(nil, T.nilable(QueryPackwerk::Violations))
 
@@ -52,232 +44,14 @@ module QueryPackwerk
         ).returns(QueryPackwerk::Violations)
       end
       def where(**query_params, &query_fn)
-        QueryPackwerk::Violations.new(super(**query_params, &query_fn))
+        # all's file cache, so a file is parsed once for every query until reload!
+        QueryPackwerk::Violations.new(super(**query_params, &query_fn), file_cache: all.file_cache)
       end
 
-      sig { void }
+      sig { returns(NilClass) }
       def reload!
         @all = nil
       end
-    end
-
-    sig do
-      params(
-        original_collection: T::Array[QueryPackwerk::Violation],
-        file_cache: QueryPackwerk::FileCache
-      ).void
-    end
-    def initialize(original_collection, file_cache: QueryPackwerk::FileCache.new)
-      @original_collection = original_collection
-      @file_cache = file_cache
-
-      @original_collection.each do |violation|
-        violation.set_cache!(file_cache)
-      end
-
-      @cache_loaded = T.let(false, T::Boolean)
-      @sources_loaded = T.let(false, T::Boolean)
-    end
-
-    sig { void }
-    def load_cache!
-      return true if @cache_loaded
-
-      warn "Prepopulating AST cache with #{file_count} files: "
-      start_time = Time.now
-
-      @original_collection.each(&:load_cache!)
-
-      finish_time = Time.now - start_time
-      warn '', "AST cache loaded in #{finish_time}"
-      @cache_loaded = true
-    end
-
-    sig { void }
-    def load_sources!
-      return true if @sources_loaded
-
-      unless @cache_loaded
-        load_cache!
-        warn
-      end
-
-      warn "Prepopulating sources cache with #{count} violations: "
-      start_time = Time.now
-
-      total_sources_loaded = @original_collection.sum do |violation|
-        $stderr.print '.'
-        violation.sources.size
-      end
-
-      finish_time = Time.now - start_time
-      warn "Loaded #{total_sources_loaded} full sources in #{finish_time}"
-
-      @sources_loaded = true
-    end
-
-    sig { returns(Integer) }
-    def file_count
-      @original_collection.sum(&:file_count)
-    end
-
-    sig { returns(T::Boolean) }
-    def empty?
-      @original_collection.empty?
-    end
-
-    sig { returns(T::Boolean) }
-    def any?
-      !empty?
-    end
-
-    # Gets all sources and their receiving chains grouped by the constant they've violated.
-    sig { returns(T.untyped) }
-    def raw_sources
-      load_sources!
-
-      deep_merge_groups(@original_collection) do |v|
-        [v.class_name, v.sources]
-      end
-    end
-
-    # Gets all sources and their receiving chains grouped by the constant they've violated.
-    sig { returns(T::Hash[String, T::Array[String]]) }
-    def sources
-      load_sources!
-
-      deep_merge_groups(@original_collection) { |v| [v.class_name, v.sources.map(&:source)] }.transform_values(&:uniq)
-    end
-
-    # In addition to the above also provide the file location and line number along with the
-    # source.
-    sig { returns(T::Hash[String, T::Array[String]]) }
-    def sources_with_locations
-      load_sources!
-
-      deep_merge_groups(@original_collection) { |v| [v.class_name, v.sources_with_locations] }
-    end
-
-    # Instead of returning all instances of the source, count how often each occurs, with the option to
-    # provide a threshold to remove lower-occurring items.
-    sig { params(threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
-    def source_counts(threshold: 0)
-      load_sources!
-
-      deep_merge_counts(@original_collection, threshold:) { |v| [v.class_name, v.source_counts] }
-    end
-
-    # "Anonymize" the arguments of sources by replacing all arguments with underscores to get a look
-    # at the "shape" of a function rather than its exact call (i.e. `test(1, 2, 3)` becomes `test(_, _, _)`).
-    #
-    # This also removes extra spacing, line-breaks, cbase constant sigils, and other extra information to
-    # give a clearer view of a call's "shape".
-    sig { returns(T::Hash[String, T::Array[String]]) }
-    def anonymous_sources
-      load_sources!
-
-      deep_merge_groups(@original_collection) { |v| [v.class_name, v.anonymous_sources] }.transform_values(&:uniq)
-    end
-
-    sig { returns(T::Hash[String, T::Hash[String, T::Array[String]]]) }
-    def anonymous_sources_with_locations
-      load_sources!
-
-      deep_merge_hash_groups(@original_collection) { |v| [v.class_name, v.anonymous_sources_with_locations] }
-    end
-
-    sig do
-      params(start_offset: Integer, end_offset: Integer).returns(T::Hash[String, T::Hash[String, T::Array[String]]])
-    end
-    def sources_with_contexts(start_offset: 3, end_offset: 3)
-      load_sources!
-
-      deep_merge_hash_groups(@original_collection) do |v|
-        [v.class_name, v.sources_with_contexts(start_offset:, end_offset:)]
-      end
-    end
-
-    sig { params(start_offset: Integer, end_offset: Integer).returns(String) }
-    def sources_with_contexts_report(start_offset: 3, end_offset: 3)
-      contexts = sources_with_contexts(start_offset:, end_offset:)
-      output = +''
-
-      contexts.each do |violated_constant, anonymized_sources|
-        heavy_underline = '=' * violated_constant.size
-        output << "#{violated_constant}\n#{heavy_underline}\n\n"
-
-        anonymized_sources.each do |anonymized_source, full_contexts|
-          light_underline = '-' * anonymized_source.size
-          output << "#{anonymized_source}\n#{light_underline}\n\n"
-
-          full_contexts.each do |context|
-            output << highlight_ruby(context)
-            output << "\n\n"
-          end
-        end
-      end
-
-      output
-    end
-
-    # Like the above source counts, but uses anonymized sources to give a clearer look at how often each
-    # "shape" of a method is called across a set of violations.
-    sig { params(threshold: Integer).returns(T::Hash[String, T::Hash[String, Integer]]) }
-    def anonymous_source_counts(threshold: 0)
-      load_sources!
-
-      deep_merge_counts(@original_collection, threshold:) { |v| [v.class_name, v.anonymous_source_counts] }
-    end
-
-    # Find which packs consume these violations
-    sig { params(threshold: Integer).returns(T::Hash[String, Integer]) }
-    def consumers(threshold: 0)
-      tallies = @original_collection.map { |v| v.consuming_pack.name }.tally
-      threshold_filter_sort(tallies, threshold:)
-    end
-
-    # Find which packs produce these violations
-    sig { params(threshold: Integer).returns(T::Hash[String, Integer]) }
-    def producers(threshold: 0)
-      tallies = @original_collection.map { |v| v.producing_pack.name }.tally
-      threshold_filter_sort(tallies, threshold:)
-    end
-
-    # Filter for violations which include one of the provided file globs
-    sig { params(file_globs: T.any(String, Regexp)).returns(QueryPackwerk::Violations) }
-    def including_files(*file_globs)
-      filtered_violations = @original_collection.select do |violation|
-        T.unsafe(violation).includes_files?(*file_globs) # Sorbet hates splats
-      end
-
-      QueryPackwerk::Violations.new(filtered_violations)
-    end
-
-    # Filter for violations which do not include one of the provided file globs
-    sig { params(file_globs: T.any(String, Regexp)).returns(QueryPackwerk::Violations) }
-    def excluding_files(*file_globs)
-      filtered_violations = @original_collection.reject do |violation|
-        T.unsafe(violation).includes_files?(*file_globs) # Sorbet hates splats
-      end
-
-      QueryPackwerk::Violations.new(filtered_violations)
-    end
-
-    sig { returns(String) }
-    def inspect
-      arr = to_a.map(&:inspect)
-      if arr.empty?
-        "#<#{self.class.name} []>"
-      else
-        "#<#{self.class.name} [\n#{arr.join("\n")}\n]>"
-      end
-    end
-
-    private
-
-    sig { params(string: String).returns(String) }
-    def highlight_ruby(string)
-      CodeRay.encode(string, :ruby, :terminal)
     end
   end
 end

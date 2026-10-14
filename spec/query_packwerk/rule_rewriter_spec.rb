@@ -66,4 +66,10 @@ RSpec.describe QueryPackwerk::RuleRewriter do
       RUBY
     end
   end
+
+  context 'With a heredoc argument' do
+    it 'leaves the source as it is, since it does not parse without the heredoc body after it' do
+      expect(described_class.rewrite('Model.execute(1, <<~SQL)')).to eq('Model.execute(1, <<~SQL)')
+    end
+  end
 end

@@ -19,4 +19,4 @@ module ActiveSupport::Multibyte::Chars; end
 module ActiveSupport::SafeBuffer; end
 module ActiveSupport::StringInquirer; end
 module ActiveSupport::TimeZone; end
-module QueryPackwerk::Violation::ApplicationRecord; end
+module QueryPackwerk::ConstantUse::ApplicationRecord; end

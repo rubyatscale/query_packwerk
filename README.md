@@ -1,7 +1,7 @@
 # QueryPackwerk
 
 QueryPackwerk is a Ruby gem for querying and analyzing [Packwerk](https://github.com/Shopify/packwerk) violations in Ruby applications.
-It provides a friendly API for exploring `package.yml` and `package_todo.yml` files, making it easier to manage module boundaries and dependencies in your codebase.
+It provides a friendly API for exploring `package.yml` and `package_todo.yml` files, and the references between packs that [pks](https://github.com/rubyatscale/pks) lists, making it easier to manage module boundaries and dependencies in your codebase.
 
 ## Installation
 
@@ -80,10 +80,33 @@ query_packwerk:001:0> Violations.all
 
 ```
 
-If you change any of the package.yml or package_todo.yml files, you can reload the running console:
+Explore references, whether or not they break a rule:
+
+package_todo.yml files record only the references that break a pack's rules. To list every reference from one pack to another pack's constants, including those that a declared dependency or a public constant allows, QueryPackwerk runs [pks](https://github.com/rubyatscale/pks) 0.7.0 or later. It runs `bin/pks` if your app has one, or else `pks` on your `PATH`. See pks's [installation instructions](https://github.com/rubyatscale/pks/blob/main/INSTALLATION.md).
 
 ```ruby
-# Reset the cache
+# Get all references to a pack's constants
+query_packwerk:001:0> references_for("pack_name")
+
+# Get the 'shape' of the references to a pack that break no rule
+query_packwerk:001:0> References.where(producing_pack: "packs/pack_name", allowed: true).anonymous_source_counts
+
+# Get the references to a pack that break a rule no package_todo.yml records, which `pks check` reports
+query_packwerk:001:0> References.where(producing_pack: "packs/pack_name", unrecorded: true)
+
+# Get all references from a pack to other packs' constants
+query_packwerk:001:0> references_from("pack_name")
+
+# Get all references
+query_packwerk:001:0> References.all
+```
+
+References have the same methods as violations, like `sources_with_locations` and `anonymous_source_counts`. Each one is where pks finds it, so its source is found even where the code names a constant relatively, as `Bar` inside `module Foo`. A reference that pks infers from an association, as `has_many :tacos` does for `Taco`, has the association as its source. pks gives no positions in ERB templates, so there a reference's sources are wherever the template names the constant. Finding sources parses each file they're in, which for a pack that thousands of files reference takes a while, and keeps each one in memory, about 200 KB for a file of 100 lines, until `reload!`.
+
+If you change your code or any of the package.yml or package_todo.yml files, you can reload the running console:
+
+```ruby
+# Reset the cache, so the next query of references runs pks again
 query_packwerk:001:0> reload!
 ```
 
@@ -102,6 +125,9 @@ consumers = QueryPackwerk.consumers("my_pack")
 
 # Get a count of all violation types
 counts = QueryPackwerk.violation_counts_for("my_pack")
+
+# Get how other packs use your pack, whether or not they break a rule
+QueryPackwerk.references_for("my_pack").anonymous_source_counts
 ```
 
 ## Examples
@@ -123,6 +149,8 @@ QueryPackwerk.anonymous_violation_counts_for("my_pack", threshold: 3)
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+The specs for references use what pks lists for an app they write, and one spec checks that against pks itself. It runs where pks is on your `PATH`, as in CI. To install the version it checks against, run `bin/install-pks` and add `tmp/pks` to your `PATH`.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, bump `VERSION` in `lib/query_packwerk/version.rb` in your PR and run `bundle install` so `Gemfile.lock` matches. When the PR is merged and CI passes on `main`, the gem is tagged and published to RubyGems automatically. Merges that don't change the version don't publish anything.
 

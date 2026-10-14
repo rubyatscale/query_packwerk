@@ -13,7 +13,7 @@ module QueryPackwerk
       sig { returns(RuboCop::ProcessedSource) }
       attr_reader :source
 
-      sig { returns(RuboCop::AST::Node) }
+      sig { returns(T.nilable(RuboCop::AST::Node)) }
       attr_reader :ast
 
       sig { returns(Parser::Source::TreeRewriter) }
@@ -35,7 +35,9 @@ module QueryPackwerk
       def process
         @rules.each do |rule_class|
           rule = rule_class.new(@rewriter)
-          @ast.each_node { |node| rule.process(node) }
+          # nil for a call with a heredoc argument, which doesn't parse without the
+          # heredoc's body on the lines after it, so its arguments are left as they are
+          @ast&.each_node { |node| rule.process(node) }
         end
 
         @rewriter

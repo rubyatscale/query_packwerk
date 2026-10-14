@@ -16,6 +16,16 @@ RSpec.describe QueryPackwerk::Violations do
 
       expect(violations).to eq(['::Beekeeping::HoneyProduction::Nectars'])
     end
+
+    it 'finds a constant named without its leading ::' do
+      violations = described_class.where(constant_name: 'Beekeeping::HoneyProduction::Nectars').map(&:class_name)
+
+      expect(violations).to eq(['::Beekeeping::HoneyProduction::Nectars'])
+    end
+
+    it 'keeps the files that all parses, so each query parses a file only once' do
+      expect(described_class.where(privacy: true).file_cache).to equal(described_class.all.file_cache)
+    end
   end
 
   describe '#empty? and #any?' do
@@ -94,6 +104,19 @@ RSpec.describe QueryPackwerk::Violations do
           CONTEXT
         ]
       )
+    end
+  end
+end
+
+RSpec.describe QueryPackwerk::Violations do
+  include_context 'referenced packs'
+
+  describe '.where' do
+    it 'finds the violations of a pack with an owner' do
+      expect(described_class.where(owned: true).map { |violation| violation.consuming_pack.name }).to contain_exactly(
+        'packs/hive_dashboard', 'packs/apiary_reports'
+      )
+      expect(described_class.where(owned: false)).to be_empty
     end
   end
 end

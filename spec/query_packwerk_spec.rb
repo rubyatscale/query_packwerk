@@ -9,6 +9,10 @@ RSpec.describe QueryPackwerk do
       expect(described_class.package(package_name)).to be_a(QueryPackwerk::Package)
     end
 
+    it 'gets a package by its name in packs/, as violations_for does' do
+      expect(described_class.package('honey_production')&.name).to eq('packs/honey_production')
+    end
+
     it 'returns nil if the package does not exist' do
       expect(described_class.package('not_here')).to be_nil
     end
@@ -141,6 +145,81 @@ RSpec.describe QueryPackwerk do
 
     it 'can be given a threshold' do
       expect(described_class.anonymous_violation_counts_for(package_name, threshold: 3)).to eq({})
+    end
+  end
+end
+
+RSpec.describe QueryPackwerk do
+  include_context 'listed references'
+
+  describe '#references_for' do
+    it "gets all references from other packs to a pack's constants" do
+      references = described_class.references_for('honey_production')
+
+      expect(references).to be_a(QueryPackwerk::References)
+      expect(references.count).to eq(8)
+    end
+  end
+
+  describe '#references_from' do
+    it "gets all references from a pack to other packs' constants" do
+      expect(described_class.references_from('hive_dashboard').map(&:constant_name).tally).to eq(
+        '::HoneyProductionNectar' => 3,
+        '::Beekeeping::NectarSource' => 1,
+        '::Beekeeping::Nectars' => 1,
+        '::ApiaryReportCard' => 1
+      )
+    end
+
+    it 'takes the name of a pack outside packs/, as the root pack' do
+      expect(described_class.references_from('.').map(&:location)).to eq(['app/services/apiary_summary.rb:2'])
+    end
+  end
+
+  describe '#reload!' do
+    it 'runs pks again for the next query' do
+      described_class.references_for('honey_production')
+      described_class.reload!
+      described_class.references_for('honey_production')
+
+      expect(QueryPackwerk::Pks).to have_received(:list_references).twice
+    end
+
+    it 'returns nil, which the console shows plainly, as do the reload! of each collection' do
+      expect(described_class.reload!).to be_nil
+      expect([QueryPackwerk::Packages, QueryPackwerk::Violations, QueryPackwerk::References].map(&:reload!)).to eq([nil, nil, nil])
+    end
+
+    it 'reads the package_todo.yml files again' do
+      expect(described_class.todos_for('apiary_reports').count).to eq(1)
+
+      write_package_todo(pack_name: 'packs/apiary_reports', references: {})
+      described_class.reload!
+
+      expect(described_class.todos_for('apiary_reports').count).to eq(0)
+    end
+
+    it 'finds a pack added since, which pks lists references from' do
+      described_class.references_for('honey_production')
+
+      write_package_yml('packs/wax_reports')
+      write_file('packs/wax_reports/app/services/wax_report.rb', <<~RUBY)
+        class WaxReport
+          def nectar_count = HoneyProductionNectar.count
+        end
+      RUBY
+      listed_references << {
+        'file' => 'packs/wax_reports/app/services/wax_report.rb', 'line' => 2, 'column' => 21,
+        'constant_name' => '::HoneyProductionNectar',
+        'referencing_pack_name' => 'packs/wax_reports', 'defining_pack_name' => 'packs/honey_production',
+        'violations' => [
+          { 'violation_type' => 'dependency', 'strict' => false, 'recorded' => false },
+          { 'violation_type' => 'privacy', 'strict' => false, 'recorded' => false }
+        ]
+      }
+      described_class.reload!
+
+      expect(described_class.references_for('honey_production').consumers).to include('packs/wax_reports' => 1)
     end
   end
 end

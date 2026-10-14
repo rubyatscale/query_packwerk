@@ -10,6 +10,14 @@ RSpec.describe QueryPackwerk::FileCache do
       .map { |node| [node.loc.line, node.source] }
   end
 
+  describe '#load!' do
+    it 'prints a dot for each file it parses, and none for a file it has' do
+      write_file('app/models/account.rb', "class Account < ApplicationRecord\nend\n")
+
+      expect { file_cache.load!('app/models/account.rb', 'app/models/account.rb', headers: false) }.to output('.').to_stderr
+    end
+  end
+
   describe '#get_full_sources' do
     it 'finds references in the Ruby code of an ERB template, on their template lines' do
       write_file('app/views/invoices/show.html.erb', <<~ERB)
@@ -81,7 +89,7 @@ RSpec.describe QueryPackwerk::FileCache do
       expect do
         sources_in('app/views/invoices/show.html.erb')
         sources_in('app/views/invoices/show.html.erb', class_name: '::Billing::Payment')
-      end.to output(%r{\ACould not parse app/views/invoices/show\.html\.erb:4 \(.+\), so its violations are not included\n\z})
+      end.to output(%r{\ACould not parse app/views/invoices/show\.html\.erb:4 \(.+\), so its sources are not included\n\z})
         .to_stderr
       expect(sources_in('app/views/invoices/show.html.erb')).to eq([])
     end
@@ -100,6 +108,99 @@ RSpec.describe QueryPackwerk::FileCache do
       write_file('Gemfile.lock', "Billing::Invoice.find(1)\n")
 
       expect(sources_in('Gemfile.lock')).to eq([])
+    end
+
+    it 'gets the calls on each use of the constant, rather than on an equal use around it' do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          def merge = Billing::Invoice.merge(Billing::Invoice)
+
+          def latest = Billing::Invoice.latest.then { Billing::Invoice.latest }
+        end
+      RUBY
+
+      expect(sources_in('app/models/account.rb')).to eq(
+        [
+          [2, 'Billing::Invoice.merge(Billing::Invoice)'],
+          [2, 'Billing::Invoice'],
+          [4, 'Billing::Invoice.latest.then'],
+          [4, 'Billing::Invoice.latest']
+        ]
+      )
+    end
+
+    it 'finds no use of a constant where it is only the namespace of another' do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          def billing = Billing.for(self)
+
+          def invoice = Billing::Invoice.for(self)
+        end
+      RUBY
+
+      expect(sources_in('app/models/account.rb', class_name: '::Billing')).to eq([[2, 'Billing.for(self)']])
+    end
+  end
+
+  describe '#get_full_source_at' do
+    define_method(:source_at) do |line, column|
+      file_cache.get_full_source_at(file_name: 'app/models/account.rb', line: line, column: column)&.source
+    end
+
+    before do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          has_many :invoices, dependent: :destroy
+
+          def overdue_lines = Billing::Invoice::Line.overdue_for(self)
+
+          def summary = "Échéance ⏰ \#{Billing::Invoice.due_for(self).count}"
+        end
+      RUBY
+    end
+
+    it 'finds the outermost constant that starts there, with the calls chained on it' do
+      expect(source_at(4, 22)).to eq('Billing::Invoice::Line.overdue_for(self)')
+    end
+
+    it 'counts the column in bytes, as pks does' do
+      expect(source_at(6, 34)).to eq('Billing::Invoice.due_for(self).count')
+    end
+
+    it 'finds a constant that no call is chained on, as an argument or a superclass' do
+      write_file('app/models/account.rb', <<~RUBY)
+        class Account < ApplicationRecord
+          def latest_number = Billing::Invoice.last&.number
+
+          def invoice?(record) = record.is_a?(Billing::Invoice)
+        end
+      RUBY
+
+      expect(source_at(1, 16)).to eq('ApplicationRecord')
+      expect(source_at(2, 22)).to eq('Billing::Invoice.last&.number')
+      expect(source_at(4, 38)).to eq('Billing::Invoice')
+    end
+
+    it 'finds the call when no constant starts there, as for an association' do
+      expect(source_at(2, 2)).to eq('has_many :invoices, dependent: :destroy')
+    end
+
+    it 'finds nothing when nothing starts there' do
+      expect(source_at(4, 23)).to be_nil
+    end
+
+    it 'finds the calls on the constant there, rather than on an equal one around it' do
+      write_file('app/models/account.rb', "def merge = Billing::Invoice.merge(Billing::Invoice)\n")
+
+      expect(source_at(1, 35)).to eq('Billing::Invoice')
+    end
+
+    it 'finds nothing in a file that does not exist or does not parse' do
+      write_file('app/models/broken.rb', "Billing::Invoice.find(\n")
+
+      expect(file_cache.get_full_source_at(file_name: 'app/models/missing.rb', line: 1, column: 0)).to be_nil
+      expect { expect(file_cache.get_full_source_at(file_name: 'app/models/broken.rb', line: 1, column: 0)).to be_nil }
+        .to output(%r{\ACould not parse app/models/broken\.rb}).to_stderr
     end
   end
 end
