@@ -13,9 +13,9 @@ gem 'packs-specification'
 gem 'rake', '~> 13.4'
 gem 'rspec', '~> 3.13'
 
-gem 'rubocop', '~> 1.91'
+gem 'rubocop', '~> 1.92'
 gem 'rubocop-performance', '~> 1.27'
-gem 'rubocop-sorbet', '~> 0.16'
+gem 'rubocop-sorbet', '~> 0.17'
 
 gem 'sorbet'
 gem 'tapioca'
